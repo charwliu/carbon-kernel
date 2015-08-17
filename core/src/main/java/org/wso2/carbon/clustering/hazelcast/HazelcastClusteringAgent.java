@@ -20,6 +20,7 @@ package org.wso2.carbon.clustering.hazelcast;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.GroupConfig;
+import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
@@ -31,9 +32,9 @@ import com.hazelcast.core.MessageListener;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.clustering.internal.ClusterContext;
+import org.wso2.carbon.internal.clustering.ClusterContext;
 import org.wso2.carbon.clustering.ClusterMember;
-import org.wso2.carbon.clustering.internal.ClusterUtil;
+import org.wso2.carbon.internal.clustering.ClusterUtil;
 import org.wso2.carbon.clustering.config.ClusterConfiguration;
 import org.wso2.carbon.clustering.exception.ClusterConfigurationException;
 import org.wso2.carbon.clustering.exception.ClusterInitializationException;
@@ -44,7 +45,7 @@ import org.wso2.carbon.clustering.hazelcast.util.HazelcastUtil;
 import org.wso2.carbon.clustering.spi.ClusteringAgent;
 import org.wso2.carbon.clustering.ClusteringConstants;
 import org.wso2.carbon.clustering.ControlCommand;
-import org.wso2.carbon.clustering.internal.DataHolder;
+import org.wso2.carbon.internal.DataHolder;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.clustering.ClusterMessage;
 import org.wso2.carbon.clustering.hazelcast.multicast.MulticastBasedMembershipScheme;
@@ -108,7 +109,8 @@ public class HazelcastClusteringAgent implements ClusteringAgent {
 
         NetworkConfig nwConfig = hazelcastConfig.getNetworkConfig();
         String localMemberHost = clusterConfiguration.getLocalMemberConfiguration().getHost();
-        if (localMemberHost != null) {
+        if (localMemberHost != null && !localMemberHost.equalsIgnoreCase("127.0.0.1") &&
+            !localMemberHost.equalsIgnoreCase("localhost")) {
             localMemberHost = localMemberHost.trim();
         } else {
             try {
@@ -135,7 +137,7 @@ public class HazelcastClusteringAgent implements ClusteringAgent {
         MapConfig mapConfig = new MapConfig("carbon-map-config");
         mapConfig.setEvictionPolicy(MapConfig.DEFAULT_EVICTION_POLICY);
         if (hazelcastConfig.getLicenseKey() != null) {
-            mapConfig.setStorageType(MapConfig.StorageType.OFFHEAP);
+            mapConfig.setInMemoryFormat(InMemoryFormat.BINARY);
         }
         hazelcastConfig.addMapConfig(mapConfig);
 
