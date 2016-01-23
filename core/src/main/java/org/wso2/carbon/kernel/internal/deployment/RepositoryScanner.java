@@ -145,11 +145,6 @@ public class RepositoryScanner {
             if (Utils.isArtifactModified(deployedArtifact)) {
                 artifactsToUpdate.add(deployedArtifact);
             }
-        } else if (faultyArtifact != null) {
-            if (Utils.isArtifactModified(faultyArtifact)) {
-                removeFromFaultyArtifacts(faultyArtifact);
-                artifactsToDeploy.add(faultyArtifact);
-            }
         } else { // New artifact deployment
             artifactsToDeploy.add(artifact);
             Utils.setArtifactLastModifiedTime(artifact);
