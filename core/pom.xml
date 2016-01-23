@@ -19,20 +19,21 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-kernel</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <artifactId>carbon-kernel-parent</artifactId>
+        <version>5.1.0-SNAPSHOT</version>
+        <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.core</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon Kernel - Core</name>
     <description>
-        The single bundle of kernel which includes all core features of kernel
+        The core bundle which includes all core features of kernel
         Eg : (Deployment Framework, Logging Framework, Transport Framework, etc)
     </description>
-    <url>http://wso2.org</url>
+    <url>http://wso2.com</url>
 
     <dependencies>
         <dependency>
@@ -48,6 +49,11 @@
         <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -105,39 +111,36 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-Vendor>WSO2 Inc</Bundle-Vendor>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Activator>
-                            org.wso2.carbon.kernel.internal.CarbonCoreBundleActivator
-                        </Bundle-Activator>
-                        <Private-Package>
-                            org.wso2.carbon.kernel.internal.*,
-                        </Private-Package>
-                        <Export-Package>
-                            !org.wso2.carbon.kernel.internal,
-                            org.wso2.carbon.kernel.*; version="${carbon.kernel.package.export.version}",
-                        </Export-Package>
-                        <Import-Package>
-                            org.eclipse.osgi.util,
-                            org.slf4j.*;version="${slf4j.logging.package.import.version.range}",
-                            org.osgi.framework.*;version="${osgi.framework.package.import.version.range}",
-                            org.eclipse.osgi.framework.console;version="${osgi.framework.console.package.import.version.range}",
-                            javax.xml.bind.*;version="${osgi.framework.javax.xml.bind.package.import.version.range}",
-                            org.osgi.service.cm.*; version="${osgi.services.cm.package.import.version.range}",
-                            org.osgi.service.*;version="${equinox.osgi.services.package.import.version.range}",
-                            org.osgi.util.tracker; version="${osgi.service.tracker.package.import.version.range}",
-                        </Import-Package>
-                        <_dsannotations>*</_dsannotations>
-                    </instructions>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <bundle.activator>org.wso2.carbon.kernel.internal.CarbonCoreBundleActivator</bundle.activator>
+        <private.package>org.wso2.carbon.kernel.internal.*,</private.package>
+        <export.package>
+            !org.wso2.carbon.kernel.internal.*,
+            org.wso2.carbon.kernel.*; version="${carbon.kernel.package.export.version}",
+        </export.package>
+        <import.package>
+            org.eclipse.osgi.util;version="${org.eclipse.osgi.util.package.import.version.range}",
+            org.slf4j.*;version="${slf4j.logging.package.import.version.range}",
+            org.osgi.framework.*;version="${osgi.framework.package.import.version.range}",
+            org.eclipse.osgi.framework.console;version="${osgi.framework.console.package.import.version.range}",
+            org.osgi.service.cm.*; version="${osgi.services.cm.package.import.version.range}",
+            org.osgi.util.tracker; version="${osgi.service.tracker.package.import.version.range}",
+            org.yaml.snakeyaml.*;version="${org.snakeyaml.package.import.version.range}"
+        </import.package>
+        <provide.capability>
+            osgi.service;effective:=active;
+            objectClass="org.wso2.carbon.kernel.deployment.DeploymentService";
+            dependent-component-key="carbon-transport-mgt",
+            osgi.service;effective:=active;
+            objectClass="org.wso2.carbon.kernel.runtime.RuntimeService";
+            dependent-component-key="carbon-deployment-service",
+            osgi.service;effective:=active;
+            objectClass="org.wso2.carbon.kernel.CarbonRuntime";
+            dependent-component-key="carbon-deployment-service"
+        </provide.capability>
+    </properties>
 
 </project>

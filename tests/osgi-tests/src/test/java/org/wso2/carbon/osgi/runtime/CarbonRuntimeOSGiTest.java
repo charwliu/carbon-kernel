@@ -30,7 +30,8 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.kernel.CarbonRuntime;
 import org.wso2.carbon.kernel.config.model.CarbonConfiguration;
 import org.wso2.carbon.kernel.config.model.DeploymentModeEnum;
-import org.wso2.carbon.osgi.util.Utils;
+import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.osgi.utils.OSGiTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,28 +55,28 @@ public class CarbonRuntimeOSGiTest {
     @Inject
     private BundleContext bundleContext;
 
+    @Inject
+    private CarbonRuntime carbonRuntime;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
     @Configuration
     public Option[] createConfiguration() {
-        Utils.setCarbonHome();
-        Utils.setupMavenLocalRepo();
-        copyCarbonXML();
-        return Utils.getDefaultPaxOptions();
+        OSGiTestUtils.setupOSGiTestEnvironment();
+        copyCarbonYAML();
+        return OSGiTestUtils.getDefaultPaxOptions();
     }
 
     @Test
     public void testCarbonRuntimeService() {
-
-        ServiceReference reference = bundleContext.getServiceReference(CARBON_RUNTIME_SERVICE);
-        Assert.assertNotNull(reference, "Carbon Runtime Service Reference is null");
-
-        CarbonRuntime carbonRuntime = (CarbonRuntime) bundleContext.getService(reference);
         Assert.assertNotNull(carbonRuntime, "Carbon Runtime Service is null");
 
         CarbonConfiguration carbonConfiguration = carbonRuntime.getConfiguration();
         Assert.assertNotNull(carbonConfiguration, "Carbon Configuration is null");
     }
 
-    @Test(dependsOnMethods = { "testCarbonRuntimeService" })
+    @Test(dependsOnMethods = {"testCarbonRuntimeService"})
     public void testCarbonConfiguration() {
 
         CarbonConfiguration carbonConfiguration = getCarbonConfiguration();
@@ -88,8 +89,7 @@ public class CarbonRuntimeOSGiTest {
         Assert.assertEquals(carbonConfiguration.getDeploymentConfig().getMode(),
                 DeploymentModeEnum.fromValue("scheduled"));
         Assert.assertEquals(carbonConfiguration.getDeploymentConfig().getUpdateInterval(), 15);
-        String deploymentPath = Paths.get(System.getProperty("carbon.home"), "repository", "deployment",
-                "server").toString();
+        String deploymentPath = Paths.get(System.getProperty("carbon.home"), "deployment").toString();
         Assert.assertEquals(Paths.get(carbonConfiguration.getDeploymentConfig().getRepositoryLocation()).toString(),
                 deploymentPath);
 
@@ -105,21 +105,21 @@ public class CarbonRuntimeOSGiTest {
     }
 
     /**
-     * Replace the existing carbon.xml file with populated carbon.xml file.
+     * Replace the existing carbon.yml file with populated carbon.yml file.
      */
-    private static void copyCarbonXML() {
-        Path carbonXmlFilePath;
+    private static void copyCarbonYAML() {
+        Path carbonYmlFilePath;
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
         try {
-            carbonXmlFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", "carbon.xml");
-            Files.copy(carbonXmlFilePath, Paths.get(System.getProperty("carbon.home"), "repository", "conf",
-                    "carbon.xml"), StandardCopyOption.REPLACE_EXISTING);
+            carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", "carbon.yml");
+            Files.copy(carbonYmlFilePath, Paths.get(System.getProperty("carbon.home"), "conf",
+                    "carbon.yml"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            logger.error("Unable to copy the carbon.xml file", e);
+            logger.error("Unable to copy the carbon.yml file", e);
         }
     }
 }

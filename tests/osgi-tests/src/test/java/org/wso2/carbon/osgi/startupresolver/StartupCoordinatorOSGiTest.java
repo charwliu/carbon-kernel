@@ -21,14 +21,11 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import org.wso2.carbon.osgi.util.Utils;
+import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.osgi.utils.OSGiTestUtils;
 import org.wso2.carbon.sample.deployer.mgt.DeployerManager;
 import org.wso2.carbon.sample.runtime.mgt.RuntimeManager;
 import org.wso2.carbon.sample.transport.mgt.TransportManager;
@@ -47,26 +44,25 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class StartupCoordinatorOSGiTest {
-    private static final Logger logger = LoggerFactory.getLogger(StartupCoordinatorOSGiTest.class);
 
     @Inject
-    private BundleContext bundleContext;
+    private RuntimeManager runtimeManager;
 
     @Inject
     private DeployerManager deployerManager;
 
+    @Inject
+    private TransportManager transportManager;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
+
     @Configuration
     public Option[] createConfiguration() {
-        Utils.setCarbonHome();
-        Utils.setupMavenLocalRepo();
+        OSGiTestUtils.setupOSGiTestEnvironment();
 
         Option[] options = CoreOptions.options(
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.mgt").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.http").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.deployer.mgt").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
                 mavenBundle().artifactId("org.wso2.carbon.sample.runtime.mgt").groupId(
                         "org.wso2.carbon").versionAsInProject(),
                 mavenBundle().artifactId("org.wso2.carbon.sample.runtime.mss").groupId(
@@ -76,27 +72,35 @@ public class StartupCoordinatorOSGiTest {
                 mavenBundle().artifactId("org.wso2.carbon.sample.runtime.bps").groupId(
                         "org.wso2.carbon").versionAsInProject(),
                 mavenBundle().artifactId("org.wso2.carbon.sample.runtime.webapp").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.runtime.custom").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.deployer.mgt").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.dbs.deployer").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.transport.mgt").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.transport.http").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.order.resolver").groupId(
                         "org.wso2.carbon").versionAsInProject()
         );
 
-        return Utils.getDefaultPaxOptions(options);
+        return OSGiTestUtils.getDefaultPaxOptions(options);
     }
 
     @Test
     public void testCoordinationWithZeroServices() {
         Assert.assertNotNull(deployerManager, "DeployerManager Service is null");
 
-        int expectedTransportCount = 0;
-        int actualTransportCount = deployerManager.getDeployerCount();
-        Assert.assertEquals(actualTransportCount, expectedTransportCount, "Deployer count is not correct");
+        int expectedDeployerCount = 1;
+        int actualDeployerCount = deployerManager.getDeployerCount();
+        Assert.assertEquals(actualDeployerCount, expectedDeployerCount, "Deployer count is not correct");
     }
 
     @Test
     public void testCoordinationWithOneService() {
-        ServiceReference<TransportManager> reference = bundleContext.getServiceReference(TransportManager.class);
-        Assert.assertNotNull(reference, "TransportManager Service Reference is null");
-
-        TransportManager transportManager = bundleContext.getService(reference);
         Assert.assertNotNull(transportManager, "TransportManager Service is null");
 
         int expectedTransportCount = 1;
@@ -106,14 +110,10 @@ public class StartupCoordinatorOSGiTest {
 
     @Test
     public void testCoordinationWithMultipleService() {
-        ServiceReference<RuntimeManager> reference = bundleContext.getServiceReference(RuntimeManager.class);
-        Assert.assertNotNull(reference, "RuntimeManager Service Reference is null");
-
-        RuntimeManager runtimeManager = bundleContext.getService(reference);
         Assert.assertNotNull(runtimeManager, "RuntimeManager Service is null");
 
-        int expectedTransportCount = 4;
-        int actualTransportCount = runtimeManager.getRuntimeCount();
-        Assert.assertEquals(actualTransportCount, expectedTransportCount, "Runtime count is not correct");
+        int expectedRuntimeCount = 7;
+        int actualRuntimeCount = runtimeManager.getRuntimeCount();
+        Assert.assertEquals(actualRuntimeCount, expectedRuntimeCount, "Runtime count is not correct");
     }
 }

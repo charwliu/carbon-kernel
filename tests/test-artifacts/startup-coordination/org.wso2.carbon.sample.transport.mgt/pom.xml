@@ -17,8 +17,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>startup-coordination</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <artifactId>carbon-kernel-startup-resolver-test-artifacts</artifactId>
+        <version>5.1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -26,31 +26,16 @@
     <packaging>bundle</packaging>
 
     <name>WSO2 Carbon Kernel - Sample Transport Manager</name>
-    <url>http://wso2.org</url>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package>org.wso2.carbon.sample.transport.mgt</Export-Package>
-                        <Import-Package>*</Import-Package>
-                        <_dsannotations>*</_dsannotations>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <url>http://wso2.com</url>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.sample.order.resolver</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.eclipse.osgi</groupId>
@@ -68,5 +53,10 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+
+    <properties>
+        <export.package>org.wso2.carbon.sample.transport.mgt</export.package>
+        <import.package>*</import.package>
+    </properties>
 
 </project>

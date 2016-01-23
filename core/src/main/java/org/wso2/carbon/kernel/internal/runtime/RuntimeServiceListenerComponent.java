@@ -38,12 +38,13 @@ import org.wso2.carbon.kernel.startupresolver.RequiredCapabilityListener;
 @Component(
         name = "org.wso2.carbon.kernel.internal.runtime.RuntimeServiceListenerComponent",
         immediate = true,
-        property = "required-service-interface=org.wso2.carbon.kernel.runtime.Runtime"
+        property = {
+                "capability-name=org.wso2.carbon.kernel.runtime.Runtime",
+                "component-key=carbon-runtime-mgt"
+        }
 )
-
-
 public class RuntimeServiceListenerComponent implements RequiredCapabilityListener {
-    private static Logger logger = LoggerFactory.getLogger(RuntimeServiceListenerComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(RuntimeServiceListenerComponent.class);
     private RuntimeManager runtimeManager = new RuntimeManager();
     private BundleContext bundleContext;
 
@@ -52,6 +53,7 @@ public class RuntimeServiceListenerComponent implements RequiredCapabilityListen
         this.bundleContext = bundleContext;
         DataHolder.getInstance().setRuntimeManager(runtimeManager);
     }
+
     /**
      * Register the runtime instance.
      *

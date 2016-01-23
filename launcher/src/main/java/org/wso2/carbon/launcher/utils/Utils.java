@@ -48,14 +48,18 @@ public class Utils {
      * @return resolved system property value
      */
     public static String initializeSystemProperties(String value) {
+        //TODO this method is duplicated in org.wso2.carbon.kernel.utils.Utils class. FIX IT.
         String newValue = value;
         Matcher matcher = varPattern.matcher(value);
         while (matcher.find()) {
             String sysPropKey = value.substring(matcher.start() + 2, matcher.end() - 1);
-            String sysPropValue = System.getProperty(sysPropKey);
+            String sysPropValue = getSystemVariableValue(sysPropKey, null);
             if (isNullOrEmpty(sysPropValue)) {
                 throw new RuntimeException("System property " + sysPropKey + " cannot be null");
             }
+
+            // Due to reported bug under CARBON-14746
+            sysPropValue = sysPropValue.replace("\\", "\\\\");
             newValue = newValue.replaceFirst(VAR_REGEXP, sysPropValue);
         }
 
@@ -67,12 +71,33 @@ public class Utils {
     }
 
     /**
-     * Read repository path from properties.
+     * A utility which allows reading variables from the environment or System properties.
+     * If the variable in available in the environment as well as a System property, the System property takes
+     * precedence.
+     *
+     * @param variableName System/environment variable name
+     * @param defaultValue default value to be returned if the specified system variable is not specified.
+     * @return value of the system/environment variable
+     */
+    public static String getSystemVariableValue(String variableName, String defaultValue) {
+        String value;
+        if (System.getProperty(variableName) != null) {
+            value = System.getProperty(variableName);
+        } else if (System.getenv(variableName) != null) {
+            value = System.getenv(variableName);
+        } else {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    /**
+     * Return the value of the carbon.home system variable.
      *
      * @return repository location path
      */
-    public static Path getRepositoryDirectory() {
-        return Paths.get(System.getProperty(Constants.CARBON_HOME), Constants.REPOSITORY_DIR_PATH);
+    public static Path getCarbonHomeDirectory() {
+        return Paths.get(System.getProperty(Constants.CARBON_HOME));
     }
 
     /**
@@ -81,7 +106,7 @@ public class Utils {
      * @return launch configuration directory path
      */
     public static Path getLaunchConfigDirectory() {
-        return Paths.get(System.getProperty(Constants.CARBON_HOME), Constants.LAUNCH_CONF_DIR_PATH);
+        return Paths.get(System.getProperty(Constants.CARBON_HOME), "conf", "osgi");
     }
 
     /**

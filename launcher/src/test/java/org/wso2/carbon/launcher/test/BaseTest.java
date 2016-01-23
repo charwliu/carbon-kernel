@@ -107,15 +107,15 @@ public class BaseTest {
         System.setProperty("carbon.home", carbonHome.toString());
         try {
             Path launchPropertyFileLocation = Paths.get(testResourceDir, "launch.properties");
-            Path osgiConfLocation = Paths.get(carbonHome.toString(), "repository", "conf", "osgi");
+            Path osgiConfLocation = Paths.get(carbonHome.toString(), "conf", "osgi");
             if (!osgiConfLocation.toFile().exists()) {
                 Files.createDirectories(osgiConfLocation);
                 Files.copy(launchPropertyFileLocation,
                         osgiConfLocation.resolve(launchPropertyFileLocation.getFileName()),
                         StandardCopyOption.REPLACE_EXISTING);
             }
-            Path pidFileLocation = Paths.get(testResourceDir, "wso2carbon.pid");
-            if (!Paths.get(carbonHome.toString(), "wso2carbon.pid").toFile().exists()) {
+            Path pidFileLocation = Paths.get(testResourceDir, "carbon.pid");
+            if (!Paths.get(carbonHome.toString(), "carbon.pid").toFile().exists()) {
                 Files.copy(pidFileLocation, carbonHome.resolve(pidFileLocation.getFileName()),
                         StandardCopyOption.REPLACE_EXISTING);
             }

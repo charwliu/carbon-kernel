@@ -19,11 +19,11 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.kernel.runtime.RuntimeService;
+import org.wso2.carbon.kernel.utils.CarbonServerInfo;
 
 import javax.inject.Inject;
 
@@ -39,14 +39,16 @@ public class RuntimeServiceOSGITest {
     @Inject
     private BundleContext bundleContext;
 
+    @Inject
+    private RuntimeService runtimeService;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
     @Test
     public void testRuntimeService() {
-        ServiceReference reference = bundleContext.getServiceReference(RuntimeService.class.getName());
-        Assert.assertNotNull(reference, "RuntimeService Reference is null");
-
-        RuntimeService runtimeService = (RuntimeService) bundleContext.getService(reference);
-        Assert.assertNotNull(runtimeService, "RuntimeService is null");
-
+        // TODO Remvoe this test.
+        Assert.assertNotNull(runtimeService, "Pluggable Runtime Service is null");
     }
 
 }

@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +38,7 @@ import static org.wso2.carbon.launcher.Constants.ExitCodes;
 import static org.wso2.carbon.launcher.Constants.LAUNCH_PROPERTIES_FILE;
 import static org.wso2.carbon.launcher.Constants.LOG_LEVEL_WARN;
 import static org.wso2.carbon.launcher.Constants.PAX_DEFAULT_SERVICE_LOG_LEVEL;
+import static org.wso2.carbon.launcher.Constants.PAX_LOG_SERVICE_RANKING_LEVEL;
 import static org.wso2.carbon.launcher.Constants.PROFILE;
 
 /**
@@ -52,21 +54,30 @@ public class Main {
      * @param args arguments
      */
     public static void main(String[] args) {
-        // 1) Initialize and/or verify System properties
+
+        //get the starting time to calculate the server startup time duration
+        if (System.getProperty(Constants.START_TIME) == null) {
+            System.setProperty(Constants.START_TIME, System.currentTimeMillis() + "");
+        }
+
+        // 1) Process command line arguments.
+        processCmdLineArgs(args);
+
+        // 2) Initialize and/or verify System properties
         initAndVerifySysProps();
 
-        // 2) Load the Carbon start configuration
+        // 3) Load the Carbon start configuration
         CarbonLaunchConfig config = loadCarbonLaunchConfig();
 
         CarbonServer carbonServer = new CarbonServer(config);
 
-        // 3) Register a shutdown hook to stop the server
+        // 4) Register a shutdown hook to stop the server
         registerShutdownHook(carbonServer);
 
-        // 4) Write pid to wso2carbon.pid file
+        // 5) Write pid to carbon.pid file
         writePID(System.getProperty(CARBON_HOME));
 
-        // 5) Start Carbon server.
+        // 6) Start Carbon server.
         try {
             // This method launches the OSGi framework, loads all the bundles and starts Carbon server completely.
             carbonServer.start();
@@ -143,8 +154,34 @@ public class Main {
             System.setProperty(PROFILE, DEFAULT_PROFILE);
         }
 
-        // Set log level for Pax logger to WARN.
+        // Set log level for Pax logger to WARN and log service ranking to maximum value.
         System.setProperty(PAX_DEFAULT_SERVICE_LOG_LEVEL, LOG_LEVEL_WARN);
+        System.setProperty(PAX_LOG_SERVICE_RANKING_LEVEL, String.valueOf(Integer.MAX_VALUE));
+    }
+
+    /**
+     * Process command line arguments and set corresponding system properties.
+     *
+     * @param args cmd line args
+     */
+    public static void processCmdLineArgs(String[] args) {
+        // Set the System properties
+        Arrays.asList(args)
+                .stream()
+                .filter(arg -> arg.startsWith("-D"))
+                .forEach(arg -> {
+                    int indexOfEq = arg.indexOf('=');
+                    String property;
+                    String value;
+                    if (indexOfEq != -1) {
+                        property = arg.substring(2, indexOfEq);
+                        value = arg.substring(indexOfEq + 1);
+                    } else {
+                        property = arg.substring(2);
+                        value = "true";
+                    }
+                    System.setProperty(property, value);
+                });
     }
 
     /**
@@ -179,13 +216,12 @@ public class Main {
 
         if (pid.length() != 0) {
             try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(Paths.get(carbonHome, "wso2carbon.pid").toString()),
+                    new FileOutputStream(Paths.get(carbonHome, "carbon.pid").toString()),
                     StandardCharsets.UTF_8))) {
                 writer.write(pid);
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Cannot write wso2carbon.pid file");
+                logger.log(Level.WARNING, "Cannot write carbon.pid file");
             }
         }
     }
 }
-

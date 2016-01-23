@@ -22,6 +22,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.startupresolver.RequiredCapabilityListener;
+import org.wso2.carbon.sample.startuporder.OrderResolverMonitor;
 
 /**
  * Sample Deployer Service Listener class.
@@ -32,7 +33,10 @@ import org.wso2.carbon.kernel.startupresolver.RequiredCapabilityListener;
         name = "org.wso2.carbon.sample.deployer.mgt.DeployerServicesListener",
         immediate = true,
         service = RequiredCapabilityListener.class,
-        property = "required-service-interface=org.wso2.carbon.sample.deployer.mgt.Deployer"
+        property = {
+                "capability-name=org.wso2.carbon.sample.deployer.mgt.Deployer",
+                "component-key=carbon-sample-deployment-engine"
+        }
 )
 public class DeployerServicesListener implements RequiredCapabilityListener {
     private static final Logger logger = LoggerFactory.getLogger(DeployerServicesListener.class);
@@ -41,7 +45,9 @@ public class DeployerServicesListener implements RequiredCapabilityListener {
     @Override
     public void onAllRequiredCapabilitiesAvailable() {
         logger.info("All required services are available for : " + this.getClass().getName());
+        // update an external service to track the startup order
         bundleContext.registerService(DeployerManager.class, new DeployerManager(), null);
+        OrderResolverMonitor.getInstance().setListenerInvocationOrder(DeployerServicesListener.class.getName());
     }
 
     @Activate

@@ -56,14 +56,13 @@ public class Utils {
 
     /**
      * Request: file:sample.war .
-     * Response: file:/user/wso2carbon-kernel-5.0.0/repository/deployment/server/webapps/sample.war
+     * Response: file:/user/wso2carbon-kernel-5.0.0/deployment/webapps/sample.war
      *
      * @param path       file path to resolve
      * @param parentPath parent file path of the file
      * @return file with resolved path
      */
     public static File resolveFileURL(String path, String parentPath) {
-        File file;
         if (path.contains(":") && !path.startsWith("file:")) {
             throw new RuntimeException("URLs other than file URLs are not supported.");
         }
@@ -72,7 +71,7 @@ public class Utils {
             relativeFilePath = path.substring(5);
         }
 
-        file = new File(relativeFilePath);
+        File file = new File(relativeFilePath);
         if (!file.isAbsolute()) {
             file = new File(parentPath, relativeFilePath);
             if (!file.isAbsolute()) {

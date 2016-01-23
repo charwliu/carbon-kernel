@@ -17,9 +17,10 @@ package org.wso2.carbon.kernel.internal.transports;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.osgi.framework.console.CommandProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.wso2.carbon.kernel.transports.CarbonTransport;
 import org.wso2.carbon.kernel.transports.TransportManager;
+
+import java.util.Map;
 
 /**
  * Provides OSGi console commands to manage Carbon transports.
@@ -27,8 +28,6 @@ import org.wso2.carbon.kernel.transports.TransportManager;
  * @since 5.0.0
  */
 public class TransportMgtCommandProvider implements CommandProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(TransportMgtCommandProvider.class);
 
     private TransportManager transportManager;
 
@@ -86,6 +85,8 @@ public class TransportMgtCommandProvider implements CommandProvider {
     }
 
     public void _listTransports(CommandInterpreter ci) {
-        throw new UnsupportedOperationException("This method is not implemented, yet.");
+        Map<String, CarbonTransport> map = transportManager.getTransports();
+        map.forEach((key, value) -> System.out.println("Transport Name: " + key + "\t" + " State: " +
+                                                       value.getState().toString()));
     }
 }

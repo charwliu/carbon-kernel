@@ -21,7 +21,6 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
@@ -29,21 +28,18 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+import org.wso2.carbon.kernel.deployment.ArtifactType;
 import org.wso2.carbon.kernel.deployment.Deployer;
 import org.wso2.carbon.kernel.deployment.DeploymentService;
 import org.wso2.carbon.kernel.deployment.exception.CarbonDeploymentException;
-import org.wso2.carbon.kernel.deployment.exception.DeployerRegistrationException;
-import org.wso2.carbon.kernel.deployment.exception.DeploymentEngineException;
-import org.wso2.carbon.kernel.internal.deployment.DeploymentEngine;
-import org.wso2.carbon.osgi.util.Utils;
+import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.osgi.utils.OSGiTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import javax.inject.Inject;
 
 /**
@@ -59,10 +55,9 @@ public class CarbonDeploymentEngineOSGiTest {
 
     @Configuration
     public Option[] createConfiguration() {
-        Utils.setCarbonHome();
-        Utils.setupMavenLocalRepo();
-        copyCarbonXML();
-        return Utils.getDefaultPaxOptions();
+        OSGiTestUtils.setupOSGiTestEnvironment();
+        copyCarbonYAML();
+        return OSGiTestUtils.getDefaultPaxOptions();
     }
 
 
@@ -71,6 +66,9 @@ public class CarbonDeploymentEngineOSGiTest {
 
     @Inject
     private DeploymentService deploymentService;
+
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
 
     private static String carbonRepo;
     private static String artifactPath;
@@ -115,11 +113,31 @@ public class CarbonDeploymentEngineOSGiTest {
         bundleContext.registerService(Deployer.class.getName(), customDeployer, null);
         //undeploy
         try {
+            deploymentService.undeploy(artifactPath, new ArtifactType<>("unknown"));
+        } catch (CarbonDeploymentException e) {
+            Assert.assertTrue(e.getMessage().contains("Unknown artifactType"));
+        }
+        try {
+            deploymentService.undeploy("fake.path", customDeployer.getArtifactType());
+        } catch (CarbonDeploymentException e) {
+            Assert.assertEquals(e.getMessage(), "Cannot find artifact with key : fake.path to undeploy");
+        }
+        try {
             deploymentService.undeploy(artifactPath, customDeployer.getArtifactType());
         } catch (CarbonDeploymentException e) {
             Assert.assertEquals(e.getMessage(), "Cannot find artifact with key : " + artifactPath + " to undeploy");
         }
         //deploy
+        try {
+            deploymentService.deploy("fake.path", customDeployer.getArtifactType());
+        } catch (CarbonDeploymentException e) {
+            Assert.assertTrue(e.getMessage().contains("Error wile copying artifact"));
+        }
+        try {
+            deploymentService.deploy(artifactPath, new ArtifactType<>("unknown"));
+        } catch (CarbonDeploymentException e) {
+            Assert.assertTrue(e.getMessage().contains("Unknown artifactType"));
+        }
         deploymentService.deploy(artifactPath, customDeployer.getArtifactType());
 
         //redeploy - this does not do anything for the moment.
@@ -127,47 +145,22 @@ public class CarbonDeploymentEngineOSGiTest {
     }
 
 
-    @Test(dependsOnMethods = {"testDeploymentService"})
-    public void testDeploymentEngine() throws DeploymentEngineException, InvalidSyntaxException,
-            CarbonDeploymentException, DeployerRegistrationException {
-        DeploymentEngine deploymentEngine = new DeploymentEngine(carbonRepo);
-        CustomDeploymentService customDeploymentService = new CustomDeploymentService(deploymentEngine);
-        Dictionary<String, String> properties = new Hashtable<>();
-        properties.put("ServiceType", "Custom");
-
-        ServiceRegistration serviceRegistration = bundleContext.registerService(DeploymentService.class,
-                customDeploymentService, properties);
-
-        String filter = "(ServiceType=Custom)";
-        ServiceReference<?>[] references = bundleContext.getServiceReferences(DeploymentService.class.getName(),
-                filter);
-        Assert.assertNotNull(references, "Custom Deployment Service Reference is null");
-
-        CustomDeployer customDeployer = new CustomDeployer();
-        deploymentEngine.registerDeployer(customDeployer);
-        //deploy
-        customDeploymentService.deploy(artifactPath, customDeployer.getArtifactType());
-        //un-register
-        deploymentEngine.unregisterDeployer(customDeployer);
-        serviceRegistration.unregister();
-    }
-
     /**
-     * Replace the existing carbon.xml file with populated carbon.xml file.
+     * Replace the existing carbon.yml file with populated carbon.yml file.
      */
-    private static void copyCarbonXML() {
-        Path carbonXmlFilePath;
+    private static void copyCarbonYAML() {
+        Path carbonYAMLFilePath;
 
         String basedir = System.getProperty("basedir");
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
         try {
-            carbonXmlFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", "carbon.xml");
-            Files.copy(carbonXmlFilePath, Paths.get(System.getProperty("carbon.home"), "repository", "conf",
-                    "carbon.xml"), StandardCopyOption.REPLACE_EXISTING);
+            carbonYAMLFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", "carbon.yml");
+            Files.copy(carbonYAMLFilePath, Paths.get(System.getProperty("carbon.home"), "conf",
+                    "carbon.yml"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            logger.error("Unable to copy the carbon.xml file", e);
+            logger.error("Unable to copy the carbon.yml file", e);
         }
     }
 }

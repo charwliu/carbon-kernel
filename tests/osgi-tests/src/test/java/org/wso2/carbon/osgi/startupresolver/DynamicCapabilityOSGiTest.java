@@ -24,7 +24,8 @@ import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-import org.wso2.carbon.osgi.util.Utils;
+import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.osgi.utils.OSGiTestUtils;
 import org.wso2.carbon.sample.transport.mgt.TransportManager;
 
 import javax.inject.Inject;
@@ -44,6 +45,9 @@ public class DynamicCapabilityOSGiTest {
     @Inject
     TransportManager transportManager;
 
+    @Inject
+    private CarbonServerInfo carbonServerInfo;
+
     /**
      * This configuration registers the capability "org.wso2.carbon.sample.transport.mgt.Transport" statically using
      * Provider-Capability header with "org.wso2.carbon.sample.transport.http" bundle and also dynamically registers
@@ -54,8 +58,7 @@ public class DynamicCapabilityOSGiTest {
      */
     @Configuration
     public Option[] createConfiguration() {
-        Utils.setCarbonHome();
-        Utils.setupMavenLocalRepo();
+        OSGiTestUtils.setupOSGiTestEnvironment();
 
         Option[] options = CoreOptions.options(
                 mavenBundle().artifactId("org.wso2.carbon.sample.transport.mgt").groupId(
@@ -63,15 +66,19 @@ public class DynamicCapabilityOSGiTest {
                 mavenBundle().artifactId("org.wso2.carbon.sample.transport.http").groupId(
                         "org.wso2.carbon").versionAsInProject(),
                 mavenBundle().artifactId("org.wso2.carbon.sample.transport.custom").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.transport.jms").groupId(
+                        "org.wso2.carbon").versionAsInProject(),
+                mavenBundle().artifactId("org.wso2.carbon.sample.order.resolver").groupId(
                         "org.wso2.carbon").versionAsInProject()
         );
 
-        return Utils.getDefaultPaxOptions(options);
+        return OSGiTestUtils.getDefaultPaxOptions(options);
     }
 
     @Test
     public void testCoordinationWithDynamicAndStaticCapability() {
-        int expectedTransportCount = 4;
+        int expectedTransportCount = 6;
         int actualTransportCount = transportManager.getTransportCount();
         Assert.assertEquals(actualTransportCount, expectedTransportCount, "Transport count is not correct");
     }

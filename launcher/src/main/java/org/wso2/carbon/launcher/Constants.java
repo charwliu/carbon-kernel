@@ -15,8 +15,6 @@
  */
 package org.wso2.carbon.launcher;
 
-import java.nio.file.Paths;
-
 /**
  * Carbon constants.
  *
@@ -30,7 +28,7 @@ public class Constants {
     public static final String CARBON_START_TIME = "carbon.start.time";
 
     public static final String PROFILE = "profile";
-    public static final String DEFAULT_PROFILE = "profile/default";
+    public static final String DEFAULT_PROFILE = "profiles/default";
 
     public static final String CARBON_OSGI_REPOSITORY = "carbon.osgi.repository";
     public static final String CARBON_OSGI_FRAMEWORK = "carbon.osgi.framework";
@@ -42,11 +40,13 @@ public class Constants {
     public static final String OSGI_INSTANCE_AREA = "osgi.instance.area";
     public static final String ECLIPSE_P2_DATA_AREA = "eclipse.p2.data.area";
 
-    public static final String REPOSITORY_DIR_PATH = "repository";
-    public static final String REPOSITORY_CONF_DIR_PATH = Paths.get(REPOSITORY_DIR_PATH, "conf").toString();
-    public static final String LAUNCH_CONF_DIR_PATH = Paths.get(REPOSITORY_CONF_DIR_PATH, "osgi").toString();
-
     public static final String PAX_DEFAULT_SERVICE_LOG_LEVEL = "org.ops4j.pax.logging.DefaultServiceLog.level";
+    public static final String PAX_LOG_SERVICE_RANKING_LEVEL = "org.ops4j.pax.logging.ranking";
+
+    public static final String EQUINOX_SIMPLE_CONFIGURATOR_EXCLUSIVE_INSTALLATION =
+            "org.eclipse.equinox.simpleconfigurator.exclusiveInstallation";
+
+    public static final String START_TIME = "carbon.start.time";
 
     //Constants relevant to log level.
     public static final String LOG_LEVEL_WARN = "WARN";
