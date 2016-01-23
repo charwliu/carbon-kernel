@@ -1,12 +1,12 @@
 #!/bin/sh
-# ----------------------------------------------------------------------------
-#  Copyright 2005-2012 WSO2, Inc. http://www.wso2.org
+# ---------------------------------------------------------------------------
+#  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
@@ -72,14 +72,10 @@ PRGDIR=`dirname "$PRG"`
 # Only set CARBON_HOME if not already set
 [ -z "$CARBON_HOME" ] && CARBON_HOME=`cd "$PRGDIR/.." ; pwd`
 
-# Set AXIS2_HOME. Needed for One Click JAR Download
-AXIS2_HOME=$CARBON_HOME
-
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin; then
   [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$CARBON_HOME" ] && CARBON_HOME=`cygpath --unix "$CARBON_HOME"`
-  [ -n "$AXIS2_HOME" ] && CARBON_HOME=`cygpath --unix "$CARBON_HOME"`
 fi
 
 # For OS400
@@ -101,8 +97,6 @@ if $mingw ; then
     CARBON_HOME="`(cd "$CARBON_HOME"; pwd)`"
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
-  [ -n "$AXIS2_HOME" ] &&
-    CARBON_HOME="`(cd "$CARBON_HOME"; pwd)`"
   # TODO classpath?
 fi
 
@@ -211,10 +205,10 @@ elif [ "$CMD" = "version" ]; then
 fi
 
 # ---------- Handle the SSL Issue with proper JDK version --------------------
-jdk_16=`$JAVA_HOME/bin/java -version 2>&1 | grep "1.[6|7]"`
-if [ "$jdk_16" = "" ]; then
+jdk_18=`$JAVA_HOME/bin/java -version 2>&1 | grep "1.[8]"`
+if [ "$jdk_18" = "" ]; then
    echo " Starting WSO2 Carbon (in unsupported JDK)"
-   echo " [ERROR] CARBON is supported only on JDK 1.6 and 1.7"
+   echo " [ERROR] CARBON is supported only on JDK 1.8"
 fi
 
 CARBON_XBOOTCLASSPATH=""
@@ -245,7 +239,6 @@ done
 if $cygwin; then
   JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`
   CARBON_HOME=`cygpath --absolute --windows "$CARBON_HOME"`
-  AXIS2_HOME=`cygpath --absolute --windows "$CARBON_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
   CARBON_CLASSPATH=`cygpath --path --windows "$CARBON_CLASSPATH"`
@@ -269,7 +262,7 @@ while [ "$status" = "$START_EXIT_STATUS" ]
 do
     $JAVACMD \
     -Xbootclasspath/a:"$CARBON_XBOOTCLASSPATH" \
-    -Xms256m -Xmx1024m -XX:MaxPermSize=256m \
+    -Xms256m -Xmx1024m \
     -XX:+HeapDumpOnOutOfMemoryError \
     -XX:HeapDumpPath="$CARBON_HOME/repository/logs/heap-dump.hprof" \
     $JAVA_OPTS \
@@ -281,7 +274,6 @@ do
     -Djava.command="$JAVACMD" \
     -Dcarbon.home="$CARBON_HOME" \
     -Dcarbon.repository="$CARBON_HOME/repository" \
-    -Djava.util.logging.config.file="$CARBON_HOME/repository/conf/etc/logging-bridge.properties" \
     -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog \
     -Djava.security.egd=file:/dev/./urandom \
     -Dfile.encoding=UTF8 \

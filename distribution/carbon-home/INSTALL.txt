@@ -1,12 +1,12 @@
 Installing  WSO2 Carbon Kernel ${carbon.version}
 
-1. The directory containing this INSTALL file will the root and it will be
-   treated as Carbon home directory and let it be CARBON_HOME.
+1. The directory containing this INSTALL.txt file will be the root directory,
+   and let it be CARBON_HOME.
 
 2. All the shell scripts and .bat files are available in CARBON_HOME/bin directory.
 
-3. To start Carbon, use wso2server.sh in all *nix
-   system & wso2server.bat file on Windows operating systems.
+3. To start Carbon Server, use wso2server.sh in all *nix system, and wso2server.bat
+   file on Windows operating systems.
 
 4. Either of the following commands can be used to start Carbon
       i)  ./wso2server.sh 
@@ -20,10 +20,9 @@ Installing  WSO2 Carbon Kernel ${carbon.version}
 
 Hardware Requirements
 -------------------
-1. Minimum memory - 512GB
+1. Minimum memory - 512MB
 2. Processor      - Pentium 800MHz or equivalent at minimum
 
 Software Requirements
 -------------------
-1. Java SE Development Kit - 1.7
-2. Apache Ant - An Apache Ant version is required. Ant 1.7.0 version is recommended.
+1. Java SE Development Kit - 1.8

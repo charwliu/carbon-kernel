@@ -1,5 +1,5 @@
 <!--
- ~ Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
  ~ Version 2.0 (the "License"); you may not use this file except
@@ -36,7 +36,9 @@
                 <exclude>**/*.properties</exclude>
                 <exclude>**/native/*</exclude>
                 <exclude>**/wso2carbon-version.txt</exclude>
+                <exclude>**/version.txt</exclude>
                 <exclude>**/carbon.xml</exclude>
+                <exclude>**/log4j2.xml</exclude>
                 <exclude>INSTALL.txt</exclude>
                 <exclude>README.txt</exclude>
                 <exclude>LICENSE.txt</exclude>
@@ -51,7 +53,6 @@
                 <include>**/native/*</include>
             </includes>
             <fileMode>755</fileMode>
-
         </fileSet>
 
         <!-- copy scripts for embedded database -->
@@ -77,7 +78,7 @@
 
     <files>
         <file>
-            <source>carbon-home/repository/conf/log4j.properties</source>
+            <source>carbon-home/repository/conf/log4j2.xml</source>
             <outputDirectory>repository/conf</outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
@@ -106,14 +107,30 @@
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
-
+        <file>
+            <source>carbon-home/LICENSE.txt</source>
+            <outputDirectory></outputDirectory>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>carbon-home/release-notes.html</source>
+            <outputDirectory></outputDirectory>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </file>
         <file>
             <source>carbon-home/repository/conf/carbon.xml</source>
             <outputDirectory>repository/conf/</outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
-
+        <file>
+            <source>carbon-home/bin/version.txt</source>
+            <outputDirectory>bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
     </files>
 
     <dependencySets>
@@ -122,6 +139,12 @@
             <includes>
                 <include>org.wso2.carbon:org.wso2.carbon.launcher:jar</include>
                 <include>org.osgi:org.osgi.core:jar</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib/tools</outputDirectory>
+            <includes>
+                <include>org.wso2.carbon:org.wso2.carbon.tools:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>
