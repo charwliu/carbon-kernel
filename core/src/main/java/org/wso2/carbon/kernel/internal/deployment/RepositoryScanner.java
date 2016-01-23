@@ -182,12 +182,4 @@ public class RepositoryScanner {
 
         artifactFilePathList.clear();
     }
-
-    private Artifact findFaultyArtifact(String path) {
-        return carbonDeploymentEngine.getFaultyArtifacts().get(path);
-    }
-
-    private void removeFromFaultyArtifacts(Artifact faultyArtifact) {
-        carbonDeploymentEngine.getFaultyArtifacts().remove(faultyArtifact.getPath());
-    }
 }
