@@ -1,59 +1,63 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
-
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.wso2.carbon.launcher.test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.wso2.carbon.launcher.utils.Utils;
 
-@Test(groups = "utils")
-public class UtilsTest {
+/**
+ * Launcher Utils test class.
+ *
+ * @since 5.0.0
+ */
 
-    public void substituteVarsTest(){
+@Test(groups = "utils")
+public class UtilsTest extends BaseTest {
+
+    public void substituteVarsTest() {
         System.setProperty("profile", "default");
         String inputStr = "file:${profile}";
         String expectedOutputStr = "file:default";
 
-        String outputStr = Utils.substituteVars(inputStr);
+        String outputStr = Utils.initializeSystemProperties(inputStr);
         Assert.assertEquals(outputStr, expectedOutputStr);
     }
 
-    public void substituteVarsTest2(){
+    public void substituteVarsTest2() {
         System.setProperty("profile", "default");
         System.setProperty("carbon.home", "/home/user/wso2carbon-kernel-5.0.0");
-        String inputStr = "file:${carbon.home}/repository/components/${profile}";
-        String expectedOutputStr = "file:/home/user/wso2carbon-kernel-5.0.0/repository/components/default";
+        String inputStr = "file:${carbon.home}/osgi/${profile}";
+        String expectedOutputStr = "file:/home/user/wso2carbon-kernel-5.0.0/osgi/default";
 
-        String outputStr = Utils.substituteVars(inputStr);
+        String outputStr = Utils.initializeSystemProperties(inputStr);
         Assert.assertEquals(outputStr, expectedOutputStr);
+        setupCarbonHome();
     }
 
-    public void substituteVarsTest3(){
+    public void substituteVarsTest3() {
         System.setProperty("profile", "default");
         String inputStr = "${profile}";
         String expectedOutputStr = "default";
 
-        String outputStr = Utils.substituteVars(inputStr);
+        String outputStr = Utils.initializeSystemProperties(inputStr);
         Assert.assertEquals(outputStr, expectedOutputStr);
     }
 
-    public void stringTokenizeTest(){
+    public void stringTokenizeTest() {
         String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true," +
                 "file:plugins/org.apache.felix.gogo.runtime_0.10.0.v201209301036.jar@2:true," +
                 "file:plugins/org.apache.felix.gogo.command_0.10.0.v201209301215.jar@2:true," +
@@ -72,10 +76,11 @@ public class UtilsTest {
         Assert.assertEquals(output, expectedArray);
     }
 
-    public void stringTokenizeTest2(){
+    public void stringTokenizeTest2() {
         String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true";
 
-        String[] expectedArray = new String[]{"file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true"};
+        String[] expectedArray =
+                new String[]{"file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true"};
 
         String[] output = Utils.tokenize(str, ",");
         Assert.assertEquals(output, expectedArray);

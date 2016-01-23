@@ -1,5 +1,5 @@
 <!--
- ~ Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
  ~ Version 2.0 (the "License"); you may not use this file except
@@ -25,18 +25,15 @@
 
     <fileSets>
         <fileSet>
-            <directory>target/repository</directory>
-            <outputDirectory>repository</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>carbon-home</directory>
             <outputDirectory></outputDirectory>
             <excludes>
                 <exclude>**/*.sh</exclude>
                 <exclude>**/*.properties</exclude>
                 <exclude>**/native/*</exclude>
-                <exclude>**/wso2carbon-version.txt</exclude>
-                <exclude>**/carbon.xml</exclude>
+                <exclude>**/kernel-version.txt</exclude>
+                <exclude>**/carbon.yml</exclude>
+                <exclude>**/log4j2.xml</exclude>
                 <exclude>INSTALL.txt</exclude>
                 <exclude>README.txt</exclude>
                 <exclude>LICENSE.txt</exclude>
@@ -51,18 +48,12 @@
                 <include>**/native/*</include>
             </includes>
             <fileMode>755</fileMode>
-
         </fileSet>
 
-        <!-- copy scripts for embedded database -->
-        <fileSet>
-            <directory>src/scripts</directory>
-            <outputDirectory>resources/dbscripts</outputDirectory>
-        </fileSet>
         <!-- Copying p2 profile and osgi bundles-->
         <fileSet>
             <directory>target/WSO2Carbon</directory>
-            <outputDirectory>repository/components</outputDirectory>
+            <outputDirectory>osgi</outputDirectory>
             <fileMode>644</fileMode>
             <excludes>
                 <exclude>**/eclipse.ini</exclude>
@@ -77,20 +68,14 @@
 
     <files>
         <file>
-            <source>carbon-home/repository/conf/log4j.properties</source>
-            <outputDirectory>repository/conf</outputDirectory>
+            <source>carbon-home/conf/log4j2.xml</source>
+            <outputDirectory>conf</outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>carbon-home/repository/conf/osgi/launch.properties</source>
-            <outputDirectory>repository/conf/osgi</outputDirectory>
-            <fileMode>644</fileMode>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>carbon-home/bin/wso2carbon-version.txt</source>
-            <outputDirectory>bin/</outputDirectory>
+            <source>carbon-home/conf/osgi/launch.properties</source>
+            <outputDirectory>conf/osgi</outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
@@ -106,22 +91,44 @@
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
-
         <file>
-            <source>carbon-home/repository/conf/carbon.xml</source>
-            <outputDirectory>repository/conf/</outputDirectory>
+            <source>carbon-home/LICENSE.txt</source>
+            <outputDirectory></outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>
         </file>
-
+        <file>
+            <source>carbon-home/release-notes.html</source>
+            <outputDirectory></outputDirectory>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>carbon-home/conf/carbon.yml</source>
+            <outputDirectory>conf/</outputDirectory>
+            <fileMode>644</fileMode>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>carbon-home/bin/kernel-version.txt</source>
+            <outputDirectory>bin/</outputDirectory>
+            <filtered>true</filtered>
+            <fileMode>644</fileMode>
+        </file>
     </files>
 
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory>bin/bootstrap</outputDirectory>
             <includes>
                 <include>org.wso2.carbon:org.wso2.carbon.launcher:jar</include>
                 <include>org.osgi:org.osgi.core:jar</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>bin/bootstrap/tools</outputDirectory>
+            <includes>
+                <include>org.wso2.carbon:org.wso2.carbon.tools:jar</include>
             </includes>
         </dependencySet>
     </dependencySets>

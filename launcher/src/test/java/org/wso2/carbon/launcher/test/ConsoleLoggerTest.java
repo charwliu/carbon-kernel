@@ -1,44 +1,49 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
-
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.wso2.carbon.launcher.test;
 
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-import org.wso2.carbon.launcher.bootstrapLogging.BootstrapLogger;
-import org.wso2.carbon.launcher.test.LoggingHandlers.CommonsLogHandler;
-import org.wso2.carbon.launcher.test.LoggingHandlers.JavaUtilLogHandler;
-import org.wso2.carbon.launcher.test.LoggingHandlers.SLF4jLogHandler;
+import org.wso2.carbon.launcher.bootstrap.logging.BootstrapLogger;
+import org.wso2.carbon.launcher.test.logging.handlers.CommonsLogHandler;
+import org.wso2.carbon.launcher.test.logging.handlers.JavaUtilLogHandler;
+import org.wso2.carbon.launcher.test.logging.handlers.SLF4jLogHandler;
 
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class ConsoleLoggerTest {
+/**
+ * Console Logger Test class.
+ *
+ * @since 5.0.0
+ */
+public class ConsoleLoggerTest extends BaseTest {
 
-
-    private Logger logger;
 
     JavaUtilLogHandler javaUtilLogHandler;
     CommonsLogHandler commonsLogHandler;
     SLF4jLogHandler slf4jLogHandler;
+    private Logger logger;
+
+    public ConsoleLoggerTest() {
+        super();
+    }
 
     @BeforeSuite
     public void doBeforeEachTest() {
@@ -49,7 +54,8 @@ public class ConsoleLoggerTest {
 
     @Test
     public void testJavaUtilLogs() {
-        logger = BootstrapLogger.getBootstrapLogger();
+        setupCarbonHome();
+        logger = BootstrapLogger.getCarbonLogger(ConsoleLoggerTest.class.getName());
         logger.addHandler(javaUtilLogHandler);
         String sampleMessage = "Sample javaUtilLog message-01";
         LogRecord record = new LogRecord(Level.INFO, sampleMessage);

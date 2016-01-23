@@ -1,65 +1,68 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
-
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.wso2.carbon.launcher.test;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-import org.wso2.carbon.launcher.bootstrapLogging.BootstrapLogger;
-import org.wso2.carbon.launcher.bootstrapLogging.LoggingFormatter;
+import org.wso2.carbon.launcher.bootstrap.logging.BootstrapLogger;
+import org.wso2.carbon.launcher.bootstrap.logging.LoggingFormatter;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+/**
+ * CarbonLoggerTest class which extends BaseTest class for launcher tests.
+ *
+ * @since 5.0.0
+ */
 public class CarbonLoggerTest extends BaseTest {
+    private static final String LOGS = "logs" + File.separator + "test.logs";
     Logger logger;
     CarbonLogHandler carbonLogHandler;
-    protected String testDir = "src" + File.separator + "test" + File.separator;
-    protected String testResourceDir = testDir + "resources";
-    private final static String LOGS = "logs" + File.separator + "test.logs";
 
-    /**
-     * @param testName
-     */
-    public CarbonLoggerTest(String testName) {
-        super(testName);
+    public CarbonLoggerTest() {
+        super();
     }
 
     @BeforeSuite
-    public void doBeforeEachTest() throws IOException{
-        logger = BootstrapLogger.getBootstrapLogger();
+    public void doBeforeEachTest() throws IOException {
+        setupCarbonHome();
+        logger = BootstrapLogger.getCarbonLogger(CarbonLoggerTest.class.getName());
         carbonLogHandler = new CarbonLogHandler(new File(getTestResourceFile(LOGS).getAbsolutePath()));
         carbonLogHandler.setFormatter(new LoggingFormatter());
         logger.addHandler(carbonLogHandler);
     }
 
     @Test
-    public void testCarbonLogAppend() throws IOException{
+    public void testCarbonLogAppend() throws IOException {
         String sampleMessage = "Sample message-01";
         String resultLog = "INFO {org.wso2.carbon.launcher.test.CarbonLoggerTest} - Sample message-01";
 
         logger.info(sampleMessage);
-        ArrayList<String> logRecords = getLogsFromTestResource(new FileInputStream(new File(getTestResourceFile(LOGS).getAbsolutePath())));
+        ArrayList<String> logRecords =
+                getLogsFromTestResource(new FileInputStream(new File(getTestResourceFile(LOGS).getAbsolutePath())));
         Assert.assertTrue(logRecords.get(0).contains(resultLog));
     }
 
