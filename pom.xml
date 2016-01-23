@@ -55,9 +55,9 @@
     </profiles>
 
     <scm>
-        <url>https://github.com/wso2/carbon-kernel.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/carbon-kernel.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/carbon-kernel.git</connection>
+        <url>https://github.com/charwliu/carbon-kernel.git</url>
+        <developerConnection>scm:git:https://github.com/charwliu/carbon-kernel.git</developerConnection>
+        <connection>scm:git:https://github.com/charwliu/carbon-kernel.git</connection>
         <tag>release-5.0.0</tag>
     </scm>
 
