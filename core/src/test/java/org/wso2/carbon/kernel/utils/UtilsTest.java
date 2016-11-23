@@ -16,6 +16,7 @@
 package org.wso2.carbon.kernel.utils;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.wso2.carbon.kernel.Constants;
 
@@ -44,6 +45,23 @@ public class UtilsTest {
         }
     }
 
+    @Test
+    public void testValueSubstituteVariables() {
+        String carbonHome = System.getProperty(Constants.CARBON_HOME);
+        boolean isCarbonHomeChanged = false;
+
+        if (carbonHome == null) {
+            carbonHome = "test-carbon-home";
+            System.setProperty(Constants.CARBON_HOME, carbonHome);
+            isCarbonHomeChanged = true;
+        }
+
+        Assert.assertEquals(Utils.substituteVariables("ValueNotExist"), "ValueNotExist");
+        if (isCarbonHomeChanged) {
+            System.clearProperty(Constants.CARBON_HOME);
+        }
+    }
+
     @Test(expectedExceptions = RuntimeException.class)
     public void testSubstituteVarsSystemPropertyIsNull() {
         String carbonHome = System.getProperty(Constants.CARBON_HOME);
@@ -61,5 +79,29 @@ public class UtilsTest {
                 System.setProperty(Constants.CARBON_HOME, carbonHome);
             }
         }
+    }
+
+    @Test
+    public void testGetSystemVariableValue() {
+
+        Assert.assertEquals(Utils.getSystemVariableValue("testEnvironmentVariable", null), "EnvironmentVariable");
+        Assert.assertEquals(Utils.getSystemVariableValue("${server.key.not.exist}", null, Constants.PlaceHolders.class),
+                null);
+        Assert.assertEquals(Utils.getSystemVariableValue("server.key", null, Constants.PlaceHolders.class),
+                "carbon-kernel");
+    }
+
+    @DataProvider(name = "paths")
+    public Object[][] createPaths() {
+        return new Object[][]{{"/home/wso2/wso2carbon", "/"},
+                {"C:\\Users\\WSO2\\Desktop\\CARBON~1\\WSO2CA~1.0-S", "\\"}};
+    }
+
+    @Test(dataProvider = "paths")
+    public void testPathSubstitution(String carbonHome, String pathSeparator) {
+        System.setProperty(Constants.CARBON_HOME, carbonHome);
+        String config = "${" + Constants.CARBON_HOME + "}" + pathSeparator + "deployment" + pathSeparator;
+        Assert.assertEquals(Utils.substituteVariables(config),
+                carbonHome + pathSeparator + "deployment" + pathSeparator);
     }
 }

@@ -16,7 +16,7 @@
 package org.wso2.carbon.osgi.startupresolver;
 
 import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
@@ -24,13 +24,14 @@ import org.ops4j.pax.exam.testng.listener.PaxExam;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.kernel.utils.CarbonServerInfo;
-import org.wso2.carbon.osgi.utils.OSGiTestUtils;
 import org.wso2.carbon.sample.transport.mgt.TransportManager;
 
 import javax.inject.Inject;
 
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyDropinsBundle;
 
 /**
  * This test case will test the dynamic capability registrations and then the listener implementation that waits for
@@ -40,6 +41,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
  */
 @Listeners(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
+@ExamFactory(CarbonContainerFactory.class)
 public class DynamicCapabilityOSGiTest {
 
     @Inject
@@ -58,22 +60,19 @@ public class DynamicCapabilityOSGiTest {
      */
     @Configuration
     public Option[] createConfiguration() {
-        OSGiTestUtils.setupOSGiTestEnvironment();
-
-        Option[] options = CoreOptions.options(
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.mgt").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.http").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.custom").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.transport.jms").groupId(
-                        "org.wso2.carbon").versionAsInProject(),
-                mavenBundle().artifactId("org.wso2.carbon.sample.order.resolver").groupId(
-                        "org.wso2.carbon").versionAsInProject()
-        );
-
-        return OSGiTestUtils.getDefaultPaxOptions(options);
+        return new Option[] {
+                copyDropinsBundle(maven().artifactId("org.wso2.carbon.sample.transport.mgt").groupId("org.wso2.carbon")
+                        .versionAsInProject()),
+                copyDropinsBundle(maven().artifactId("org.wso2.carbon.sample.transport.http").groupId("org.wso2.carbon")
+                        .versionAsInProject()),
+                copyDropinsBundle(
+                        maven().artifactId("org.wso2.carbon.sample.transport.custom").groupId("org.wso2.carbon")
+                                .versionAsInProject()),
+                copyDropinsBundle(maven().artifactId("org.wso2.carbon.sample.transport.jms").groupId("org.wso2.carbon")
+                        .versionAsInProject()),
+                copyDropinsBundle(maven().artifactId("org.wso2.carbon.sample.order.resolver").groupId("org.wso2.carbon")
+                        .versionAsInProject())
+        };
     }
 
     @Test

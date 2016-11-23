@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>carbon-kernel-startup-resolver-test-artifacts</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -57,6 +57,10 @@
     <properties>
         <export.package>org.wso2.carbon.sample.transport.mgt</export.package>
         <import.package>*</import.package>
+        <carbon.component>
+            startup.listener;componentName="carbon-sample-transport-mgt";
+            requiredService="org.wso2.carbon.sample.transport.mgt.Transport"
+        </carbon.component>
     </properties>
 
 </project>

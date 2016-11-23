@@ -22,7 +22,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.carbon.launcher.CarbonServerListener;
 import org.wso2.carbon.launcher.Constants;
-import org.wso2.carbon.launcher.bootstrap.logging.BootstrapLogger;
 import org.wso2.carbon.launcher.config.CarbonInitialBundle;
 import org.wso2.carbon.launcher.config.CarbonLaunchConfig;
 import org.wso2.carbon.launcher.extensions.DropinsBundleDeployer;
@@ -39,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,11 +63,11 @@ public class LoadLaunchConfigTest extends BaseTest {
     }
 
     @BeforeClass
-    public void init() {
+    public void init() throws IOException {
         setupCarbonHome();
-        logFile = new File(Utils.getCarbonHomeDirectory() + File.separator + "logs" +
-                File.separator + "carbon.log");
-        logger = BootstrapLogger.getCarbonLogger(CarbonLaunchConfig.class.getName());
+        logFile = Paths.get(Utils.getCarbonHomeDirectory().toString(), "logs", Constants.CARBON_LOG_FILE_NAME).toFile();
+        logger = Logger.getLogger(CarbonLaunchConfig.class.getName());
+        logger.addHandler(new CarbonLoggerTest.CarbonLogHandler(logFile));
         String profileName = System.getProperty(PROFILE);
         if (profileName == null || profileName.length() == 0) {
             System.setProperty(PROFILE, DEFAULT_PROFILE);
@@ -112,16 +112,17 @@ public class LoadLaunchConfigTest extends BaseTest {
     public void loadLaunchConfigOSGiFrameworkTestCase() {
         //test if property "carbon.osgi.framework" has set according to sample launch.properties file
         URL url = launchConfig.getCarbonOSGiFramework();
-        Assert.assertEquals(url.getFile().split("plugins")[1],
-                "/org.eclipse.osgi_3.10.2.v20150203-1939.jar");
+        String equinoxOSGiVersion = System.getProperty("equinox.osgi.version");
+        Assert.assertEquals(url.getFile().split("plugins")[1], "/org.eclipse.osgi_" + equinoxOSGiVersion + ".jar");
     }
 
     @Test(dependsOnMethods = {"loadCarbonLaunchConfigFromFileTestCase"})
     public void loadLaunchConfigInitialBundlesTestCase() {
         //test if property "carbon.initial.osgi.bundles" has set according to sample launch.properties file
         List<CarbonInitialBundle> initialBundleList = launchConfig.getInitialBundles();
+        String equinoxSimpleConfiguratorVersion = System.getProperty("equinox.simpleconfigurator.version");
         Assert.assertEquals(initialBundleList.get(0).getLocation().getFile().split("plugins")[1],
-                "/org.eclipse.equinox.simpleconfigurator_1.1.0.v20131217-1203.jar");
+                "/org.eclipse.equinox.simpleconfigurator_" + equinoxSimpleConfiguratorVersion + ".jar");
     }
 
     @Test(dependsOnMethods = {"loadCarbonLaunchConfigFromFileTestCase"})
@@ -129,7 +130,13 @@ public class LoadLaunchConfigTest extends BaseTest {
         //test if property "carbon.osgi.repository" has set according to sample launch.properties file
         URL osgiRepoURL = launchConfig.getCarbonOSGiRepository();
         Path expectedPath = Paths.get(System.getProperty(Constants.CARBON_HOME), "osgi");
-        Assert.assertEquals(osgiRepoURL, expectedPath.toUri().toURL());
+        if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).contains("windows")) {
+            Assert.assertEquals(Paths.get(osgiRepoURL.getPath()).toUri().toURL().toString(),
+                    expectedPath.toUri().toURL().toString());
+        } else {
+            Assert.assertEquals(osgiRepoURL.toString(), "file:".concat(expectedPath.toString()));
+        }
+
     }
 
     @Test(dependsOnMethods = {"loadCarbonLaunchConfigFromFileTestCase"})
@@ -142,11 +149,10 @@ public class LoadLaunchConfigTest extends BaseTest {
     @Test(dependsOnMethods = {"loadCarbonLaunchConfigFromFileTestCase"})
     public void carbonLogAppendTestCase() throws FileNotFoundException {
         String sampleMessage = "Sample message-test logging with class CarbonLaunchConfig";
-        String resultLog = "INFO {org.wso2.carbon.launcher.test.LoadLaunchConfigTest} - " +
-                "Sample message-test logging with class CarbonLaunchConfig";
+        String resultLog = "INFO {org.wso2.carbon.launcher.test.LoadLaunchConfigTest carbonLogAppendTestCase} - "
+                + "Sample message-test logging with class CarbonLaunchConfig";
         logger.info(sampleMessage);
-        ArrayList<String> logRecords =
-                getLogsFromTestResource(new FileInputStream(logFile));
+        ArrayList<String> logRecords = getLogsFromTestResource(new FileInputStream(logFile));
         //test if log records are added to carbon.log
         boolean isContainsInLogs = containsLogRecord(logRecords, resultLog);
         Assert.assertTrue(isContainsInLogs);

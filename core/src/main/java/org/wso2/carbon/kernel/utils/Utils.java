@@ -15,12 +15,15 @@
  */
 package org.wso2.carbon.kernel.utils;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.carbon.kernel.Constants;
 
 import java.lang.management.ManagementPermission;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,8 +33,8 @@ import java.util.regex.Pattern;
  * @since 5.0.0
  */
 public class Utils {
-    private static final String VAR_REGEXP = "\\$\\{[^}]*}";
-    private static final Pattern varPattern = Pattern.compile(VAR_REGEXP);
+    private static final Pattern varPattern = Pattern.compile("\\$\\{([^}]*)}");
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Remove default constructor and make it not available to initialize.
@@ -39,7 +42,6 @@ public class Utils {
 
     private Utils() {
         throw new AssertionError("Instantiating utility class...");
-
     }
 
     /**
@@ -75,22 +77,26 @@ public class Utils {
      * @return String substituted string
      */
     public static String substituteVariables(String value) {
-        String newValue = value;
-
         Matcher matcher = varPattern.matcher(value);
-        while (matcher.find()) {
-            String sysPropKey = value.substring(matcher.start() + 2, matcher.end() - 1);
+        boolean found = matcher.find();
+        if (!found) {
+            return value;
+        }
+        StringBuffer sb = new StringBuffer();
+        do {
+            String sysPropKey = matcher.group(1);
             String sysPropValue = getSystemVariableValue(sysPropKey, null);
             if (sysPropValue == null || sysPropValue.length() == 0) {
-                throw new RuntimeException("System property " + sysPropKey + " is not specified");
+                String msg = "System property " + sysPropKey + " is not specified";
+                logger.error(msg);
+                throw new RuntimeException(msg);
             }
-
             // Due to reported bug under CARBON-14746
             sysPropValue = sysPropValue.replace("\\", "\\\\");
-            newValue = newValue.replaceFirst(VAR_REGEXP, sysPropValue);
-        }
-
-        return newValue;
+            matcher.appendReplacement(sb, sysPropValue);
+        } while (matcher.find());
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     /**
@@ -103,13 +109,37 @@ public class Utils {
      * @return value of the system/environment variable
      */
     public static String getSystemVariableValue(String variableName, String defaultValue) {
-        String value;
+        return getSystemVariableValue(variableName, defaultValue, Constants.PlaceHolders.class);
+    }
+
+    /**
+     * A utility which allows reading variables from the environment or System properties.
+     * If the variable in available in the environment as well as a System property, the System property takes
+     * precedence.
+     *
+     * @param variableName  System/environment variable name
+     * @param defaultValue  default value to be returned if the specified system variable is not specified.
+     * @param constantClass Class from which the Predefined value should be retrieved if system variable and default
+     *                      value is not specified.
+     * @return value of the system/environment variable
+     */
+    public static String getSystemVariableValue(String variableName, String defaultValue, Class constantClass) {
+        String value = null;
         if (System.getProperty(variableName) != null) {
             value = System.getProperty(variableName);
         } else if (System.getenv(variableName) != null) {
             value = System.getenv(variableName);
         } else {
-            value = defaultValue;
+            try {
+                String constant = variableName.replaceAll("\\.", "_").toUpperCase(Locale.getDefault());
+                Field field = constantClass.getField(constant);
+                value = (String) field.get(constant);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                //Nothing to do
+            }
+            if (value == null) {
+                value = defaultValue;
+            }
         }
         return value;
     }

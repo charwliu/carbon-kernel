@@ -17,6 +17,7 @@ package org.wso2.carbon.launcher.test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.wso2.carbon.launcher.Constants;
 import org.wso2.carbon.launcher.utils.Utils;
 
 /**
@@ -29,7 +30,7 @@ import org.wso2.carbon.launcher.utils.Utils;
 public class UtilsTest extends BaseTest {
 
     public void substituteVarsTest() {
-        System.setProperty("profile", "default");
+        System.setProperty(Constants.PROFILE, Constants.DEFAULT_PROFILE);
         String inputStr = "file:${profile}";
         String expectedOutputStr = "file:default";
 
@@ -38,8 +39,8 @@ public class UtilsTest extends BaseTest {
     }
 
     public void substituteVarsTest2() {
-        System.setProperty("profile", "default");
-        System.setProperty("carbon.home", "/home/user/wso2carbon-kernel-5.0.0");
+        System.setProperty(Constants.PROFILE, Constants.DEFAULT_PROFILE);
+        System.setProperty(Constants.CARBON_HOME, "/home/user/wso2carbon-kernel-5.0.0");
         String inputStr = "file:${carbon.home}/osgi/${profile}";
         String expectedOutputStr = "file:/home/user/wso2carbon-kernel-5.0.0/osgi/default";
 
@@ -49,7 +50,7 @@ public class UtilsTest extends BaseTest {
     }
 
     public void substituteVarsTest3() {
-        System.setProperty("profile", "default");
+        System.setProperty(Constants.PROFILE, Constants.DEFAULT_PROFILE);
         String inputStr = "${profile}";
         String expectedOutputStr = "default";
 
@@ -58,29 +59,31 @@ public class UtilsTest extends BaseTest {
     }
 
     public void stringTokenizeTest() {
-        String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true," +
+        String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_1.1.200.v20160504-1450.jar@1:true," +
                 "file:plugins/org.apache.felix.gogo.runtime_0.10.0.v201209301036.jar@2:true," +
                 "file:plugins/org.apache.felix.gogo.command_0.10.0.v201209301215.jar@2:true," +
                 "file:plugins/org.apache.felix.gogo.shell_0.10.0.v201212101605.jar@2:true," +
-                "file:plugins/org.eclipse.equinox.console_1.0.100.v20130429-0953.jar@2:true";
+                "file:plugins/org.eclipse.equinox.console_1.1.200.v20150929-1405.jar@2:true";
 
-        String[] expectedArray = new String[]{
-                "file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true",
+        String[] expectedArray = new String[] {
+                "file:plugins/org.eclipse.equinox.simpleconfigurator_1.1.200.v20160504-1450.jar@1:true",
                 "file:plugins/org.apache.felix.gogo.runtime_0.10.0.v201209301036.jar@2:true",
                 "file:plugins/org.apache.felix.gogo.command_0.10.0.v201209301215.jar@2:true",
                 "file:plugins/org.apache.felix.gogo.shell_0.10.0.v201212101605.jar@2:true",
-                "file:plugins/org.eclipse.equinox.console_1.0.100.v20130429-0953.jar@2:true"
-        };
+                "file:plugins/org.eclipse.equinox.console_1.1.200.v20150929-1405.jar@2:true" };
 
         String[] output = Utils.tokenize(str, ",");
         Assert.assertEquals(output, expectedArray);
     }
 
     public void stringTokenizeTest2() {
-        String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true";
+        String equinoxSimpleConfiguratorVersion = System.getProperty("equinox.simpleconfigurator.version");
+        String str = "file:plugins/org.eclipse.equinox.simpleconfigurator_" + equinoxSimpleConfiguratorVersion
+                + ".jar@1:true";
 
-        String[] expectedArray =
-                new String[]{"file:plugins/org.eclipse.equinox.simpleconfigurator_1.0.400.v20130327-2119.jar@1:true"};
+        String[] expectedArray = new String[] {
+                "file:plugins/org.eclipse.equinox.simpleconfigurator_" + equinoxSimpleConfiguratorVersion
+                        + ".jar@1:true" };
 
         String[] output = Utils.tokenize(str, ",");
         Assert.assertEquals(output, expectedArray);

@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.launcher;
 
-import org.wso2.carbon.launcher.bootstrap.logging.BootstrapLogger;
 import org.wso2.carbon.launcher.config.CarbonLaunchConfig;
 import org.wso2.carbon.launcher.utils.Utils;
 
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -38,6 +38,8 @@ import static org.wso2.carbon.launcher.Constants.ExitCodes;
 import static org.wso2.carbon.launcher.Constants.LAUNCH_PROPERTIES_FILE;
 import static org.wso2.carbon.launcher.Constants.LOG_LEVEL_WARN;
 import static org.wso2.carbon.launcher.Constants.PAX_DEFAULT_SERVICE_LOG_LEVEL;
+import static org.wso2.carbon.launcher.Constants.PAX_LOGGING_PROPERTIES_FILE;
+import static org.wso2.carbon.launcher.Constants.PAX_LOGGING_PROPERTY_FILE_KEY;
 import static org.wso2.carbon.launcher.Constants.PAX_LOG_SERVICE_RANKING_LEVEL;
 import static org.wso2.carbon.launcher.Constants.PROFILE;
 
@@ -48,7 +50,7 @@ import static org.wso2.carbon.launcher.Constants.PROFILE;
  */
 public class Main {
 
-    private static final Logger logger = BootstrapLogger.getCarbonLogger(Main.class.getName());
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     /**
      * @param args arguments
@@ -157,6 +159,17 @@ public class Main {
         // Set log level for Pax logger to WARN and log service ranking to maximum value.
         System.setProperty(PAX_DEFAULT_SERVICE_LOG_LEVEL, LOG_LEVEL_WARN);
         System.setProperty(PAX_LOG_SERVICE_RANKING_LEVEL, String.valueOf(Integer.MAX_VALUE));
+
+        Path paxLoggingPropertiesFile = Paths.get(carbonHome, "conf", "etc", PAX_LOGGING_PROPERTIES_FILE);
+        if (paxLoggingPropertiesFile.toFile().exists()) {
+            System.setProperty(PAX_LOGGING_PROPERTY_FILE_KEY, paxLoggingPropertiesFile.toAbsolutePath().toString());
+            logger.log(Level.FINE, "Setting pax logging properties file path to : " +
+                    paxLoggingPropertiesFile.toAbsolutePath().toString());
+        } else {
+            String msg = PAX_LOGGING_PROPERTIES_FILE + " should be available to start the server";
+            logger.log(Level.SEVERE, msg);
+            throw new RuntimeException(msg);
+        }
     }
 
     /**

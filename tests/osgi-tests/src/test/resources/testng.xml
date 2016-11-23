@@ -20,15 +20,17 @@ limitations under the License.
 <suite name="Carbon-Kernel-Core_OSGI-Test-Suite">
     <test name="carbon-core-osgi-tests" preserve-order="true" parallel="false">
         <classes>
+            <class name="org.wso2.carbon.osgi.jmx.JMXOSGiTest"/>
             <class name="org.wso2.carbon.osgi.BaseOSGiTest"/>
 
-            <class name="org.wso2.carbon.osgi.deployment.CarbonDeploymentEngineOSGiTest"/>
-
             <class name="org.wso2.carbon.osgi.logging.LoggingConfigurationOSGiTest"/>
-            <!--<class name="org.wso2.carbon.osgi.logging.LoggingServiceOSGiTest"/>-->
+            <!--&lt;!&ndash;<class name="org.wso2.carbon.osgi.logging.LoggingServiceOSGiTest"/>&ndash;&gt;-->
 
             <class name="org.wso2.carbon.osgi.runtime.CarbonRuntimeOSGiTest"/>
+            <class name="org.wso2.carbon.osgi.runtime.CustomRuntimeOSGiTest"/>
+            <class name="org.wso2.carbon.osgi.context.CarbonContextOSGiTest"/>
             <class name="org.wso2.carbon.osgi.runtime.PluggableRuntimeServiceOSGiTest"/>
+            <class name="org.wso2.carbon.osgi.runtime.RuntimeOSGITest"/>
             <class name="org.wso2.carbon.osgi.runtime.RuntimeServiceOSGITest"/>
 
             <class name="org.wso2.carbon.osgi.transport.TransportServiceOSGiTest"/>
@@ -42,6 +44,12 @@ limitations under the License.
             <class name="org.wso2.carbon.osgi.startupresolver.MultipleCapabilitiesForCapabilityListenerOSGiTest"/>
             <!--keep this test as the last since there is a issue in windows intermittently-->
             <class name="org.wso2.carbon.osgi.startupresolver.PendingCapabilityRegistrationOSGiTest"/>
+
+            <!--Test Classes for test container-->
+            <class name="org.wso2.carbon.osgi.testcontainer.DistributionMavenTest"/>
+            <class name="org.wso2.carbon.osgi.testcontainer.DistributionZipTest"/>
+            <class name="org.wso2.carbon.osgi.testcontainer.DistributionDirectoryTest"/>
+            <class name="org.wso2.carbon.osgi.testcontainer.CopyDropinsTest"/>
         </classes>
     </test>
 </suite>

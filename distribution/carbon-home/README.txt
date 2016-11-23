@@ -43,7 +43,6 @@ Carbon Binary Distribution Directory Structure
         |   |-- bootstrap <directory>
         |-- osgi <directory>
         |-- conf <directory>
-        |-- deployment <directory>
         |-- logs <directory>
         |-- tmp <directory>
         |-- LICENSE.txt <file>
@@ -59,10 +58,7 @@ Carbon Binary Distribution Directory Structure
       Contains all OSGi related libraries and configurations.
 
     - conf
-      Contains server configuration files. Ex: carbon.yml
-
-    - deployment
-	  All deployment artifacts should go into this directory.
+      Contains server configuration files. Ex: carbon.yaml
 
     - logs
       Contains all log files created during execution.
@@ -91,9 +87,6 @@ programs, ranging from Web-based support up through normal business
 hours, to premium 24x7 phone support.
 
 For additional support information please refer to http://wso2.com/support/
-
-For more information on WSO2 Carbon, visit WSO2 Carbon Home Page (http://wso2.com/products/carbon)
-
 
 ---------------------------------------------------------------------------
 (c) Copyright 2015 WSO2 Inc.

@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>carbon-kernel-startup-resolver-test-artifacts</artifactId>
-        <version>5.1.0-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -56,11 +56,12 @@
 
     <properties>
         <export.package>org.wso2.carbon.sample.runtime.mgt</export.package>
-        <provide.capability>
-            osgi.service;effective:=active;
-            objectClass="org.wso2.carbon.sample.runtime.mgt.RuntimeManager";
-            dependent-component-key="carbon-sample-deployment-engine",
-        </provide.capability>
+        <carbon.component>
+            startup.listener;componentName="carbon-sample-runtime-mgt";
+            requiredService="org.wso2.carbon.sample.runtime.mgt.Runtime",
+            osgi.service;objectClass="org.wso2.carbon.sample.runtime.mgt.RuntimeManager";
+            requiredByComponentName="carbon-sample-deployment-engine, carbon-sample-transport-mgt"
+        </carbon.component>
     </properties>
 
 </project>

@@ -16,7 +16,6 @@
 package org.wso2.carbon.launcher.config;
 
 import org.wso2.carbon.launcher.CarbonServerListener;
-import org.wso2.carbon.launcher.bootstrap.logging.BootstrapLogger;
 import org.wso2.carbon.launcher.utils.FileResolver;
 import org.wso2.carbon.launcher.utils.Utils;
 
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.launcher.Constants.CARBON_HOME;
 import static org.wso2.carbon.launcher.Constants.CARBON_INITIAL_OSGI_BUNDLES;
@@ -56,7 +57,7 @@ import static org.wso2.carbon.launcher.Constants.OSGI_INSTANCE_AREA;
  */
 public class CarbonLaunchConfig {
 
-    private static final Logger logger = BootstrapLogger.getCarbonLogger(CarbonLaunchConfig.class.getName());
+    private static final Logger logger = Logger.getLogger(CarbonLaunchConfig.class.getName());
 
     private URL carbonOSGiRepository;
     private URL carbonOSGiFramework;
@@ -110,11 +111,13 @@ public class CarbonLaunchConfig {
     private <T> void loadCarbonConfiguration(T source) {
         loadFromClasspath();
         if (source != null) {
+            Properties customProperties = new Properties();
             if (source instanceof File) {
-                loadConfigurationFromFile((File) source);
+                customProperties = loadConfigurationFromFile((File) source);
             } else if (source instanceof URL) {
-                loadConfigurationFromUrl((URL) source);
+                customProperties = loadConfigurationFromUrl((URL) source);
             }
+            mergeCustomProperties(customProperties);
         }
         if (logger.isLoggable(Level.FINE)) {
             logger.log(Level.FINE, "Loaded properties from the launch.properties file.");
@@ -123,14 +126,32 @@ public class CarbonLaunchConfig {
         initializeProperties();
     }
 
+    private void mergeCustomProperties(Properties customProperties) {
+        customProperties.forEach((key, value) -> {
+            if (CARBON_INITIAL_OSGI_BUNDLES.equals(key)) {
+                properties.put((String) key, generateInitialBundlesList(properties.get(key), (String) value));
+            } else {
+                properties.put((String) key, (String) value);
+            }
+        });
+    }
+
+    private String generateInitialBundlesList(String defaultBundles, String customBundles) {
+        String[] defaultBundlesArray = Utils.tokenize(defaultBundles, ",");
+        String[] customBundlesArray = Utils.tokenize(customBundles, ",");
+        List list = Arrays.stream(defaultBundlesArray).collect(Collectors.toList());
+        list.addAll(list.size() - 1, Arrays.stream(customBundlesArray).collect(Collectors.toList()));
+        return list.toString().substring(1, list.toString().length() - 1);
+    }
+
     /**
      * Load carbon configuration from a java.io.File object.
      *
      * @param launchPropFile File
      */
-    private void loadConfigurationFromFile(File launchPropFile) {
+    private Properties loadConfigurationFromFile(File launchPropFile) {
         try (FileInputStream fileInputStream = new FileInputStream(launchPropFile)) {
-            loadLaunchConfigurationFromStream(fileInputStream);
+            return loadLaunchConfigurationFromStream(fileInputStream);
         } catch (FileNotFoundException e) {
             String errorMsg = "File " + launchPropFile + " does not exists";
             logger.log(Level.SEVERE, errorMsg, e);
@@ -147,9 +168,9 @@ public class CarbonLaunchConfig {
      *
      * @param launchPropURL URL
      */
-    private void loadConfigurationFromUrl(URL launchPropURL) {
+    private Properties loadConfigurationFromUrl(URL launchPropURL) {
         try (InputStream stream = launchPropURL.openStream()) {
-            loadLaunchConfigurationFromStream(stream);
+            return loadLaunchConfigurationFromStream(stream);
         } catch (IOException e) {
             String errorMsg = "Error loading the launch.properties";
             logger.log(Level.SEVERE, errorMsg, e);
@@ -239,7 +260,8 @@ public class CarbonLaunchConfig {
      */
     private void loadFromClasspath() {
         try (InputStream stream = CarbonLaunchConfig.class.getClassLoader().getResourceAsStream("launch.properties")) {
-            loadLaunchConfigurationFromStream(stream);
+            Properties defaultProperties = loadLaunchConfigurationFromStream(stream);
+            defaultProperties.forEach((key, value) -> properties.put((String) key, (String) value));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -250,14 +272,15 @@ public class CarbonLaunchConfig {
      *
      * @param is launch configuration input stream
      */
-    private void loadLaunchConfigurationFromStream(InputStream is) throws IOException {
+    private Properties loadLaunchConfigurationFromStream(InputStream is) throws IOException {
         Properties launchProps = new Properties();
         launchProps.load(is);
 
         // Load the Map from the properties object.
         // Replace variables with proper value. eg. ${carbon.home}.
         launchProps.forEach((key, value) ->
-                properties.put((String) key, Utils.initializeSystemProperties((String) value)));
+                launchProps.put((String) key, Utils.initializeSystemProperties((String) value)));
+        return launchProps;
     }
 
     /**
