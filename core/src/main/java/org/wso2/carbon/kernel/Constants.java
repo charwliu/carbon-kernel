@@ -21,22 +21,20 @@ import org.slf4j.LoggerFactory;
 /**
  * Carbon Constants.
  *
- * @since 5.0.0
+ * @since 5.2.0
  */
 public final class Constants {
 
-    public static final String CARBON_HOME = "carbon.home";
-    public static final String CARBON_HOME_ENV = "CARBON_HOME";
-    public static final String CARBON_CONFIG_YAML = "carbon.yaml";
+    /**
+     * maven project properties related constants.
+     */
+    public static final String PROJECT_DEFAULTS_PROPERTY_FILE = "project.defaults.properties";
+    public static final String MAVEN_PROJECT_VERSION = "MAVEN_PROJECT_VERSION";
 
     public static final String START_TIME = "carbon.start.time";
-
     public static final String LOGIN_MODULE_ENTRY = "CarbonSecurityConfig";
-
     public static final String DEFAULT_TENANT = "default";
-
     public static final String TENANT_NAME = "tenant.name";
-
     public static final String SERVER_PACKAGE = "org.wso2.carbon";
 
     /**

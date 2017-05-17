@@ -23,6 +23,8 @@ import java.nio.file.Path;
 
 /**
  * Utility class to provide an easy and intuitive way to configure the specific carbon distribution options.
+ *
+ * @since 5.2.0
  */
 public class CarbonDistributionOption {
 
@@ -66,13 +68,13 @@ public class CarbonDistributionOption {
     }
 
     /**
-     * Copy a maven bundle to the dropins directory.
+     * Copy a maven bundle to the OSGi-lib directory.
      *
      * @param mavenArtifactUrlReference maven reference of the artifact
-     * @return carbon dropins bundle option
+     * @return carbon OSGi-lib bundle option
      */
-    public static Option copyDropinsBundle(MavenArtifactUrlReference mavenArtifactUrlReference) {
-        return new CopyDropinsBundleOption(mavenArtifactUrlReference);
+    public static Option copyOSGiLibBundle(MavenArtifactUrlReference mavenArtifactUrlReference) {
+        return new CopyOSGiLibBundleOption(mavenArtifactUrlReference);
     }
 
     /**

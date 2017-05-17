@@ -29,7 +29,7 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,6 +48,7 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 public class BaseOSGiTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseOSGiTest.class);
+    private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
     @Inject
     private BundleContext bundleContext;
     @Inject
@@ -78,7 +79,7 @@ public class BaseOSGiTest {
     }
 
     /**
-     * Replace the existing carbon.yaml file with populated carbon.yaml file.
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
      */
     private Option copyCarbonYAMLOption() {
         Path carbonYmlFilePath;
@@ -87,7 +88,7 @@ public class BaseOSGiTest {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", "carbon.yaml");
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "carbon.yaml"));
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "runtime", DEPLOYMENT_FILENAME);
+        return copyFile(carbonYmlFilePath, Paths.get("conf", DEPLOYMENT_FILENAME));
     }
 }

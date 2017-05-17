@@ -31,12 +31,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
+            <groupId>org.wso2.carbon.utils</groupId>
+            <artifactId>carbon-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.base</artifactId>
+            <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -68,6 +68,9 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/docs/</directory>
             </resource>
         </resources>
 
@@ -105,6 +108,26 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon</groupId>
+                                    <artifactId>org.wso2.carbon.core</artifactId>
+                                    <version>${carbon.kernel.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/docs</outputDirectory>
+                                    <includes>config-docs/**</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -126,7 +149,8 @@
                                         <include>bin/**</include>
                                         <include>conf/**</include>
                                         <include>logs/**</include>
-                                        <include>osgi/**</include>
+                                        <include>wso2/lib/**</include>
+                                        <include>lib/**</include>
                                         <include>resources/**</include>
                                         <include>securevault/**</include>
                                         <include>tmp/**</include>
@@ -164,11 +188,11 @@
                             </adviceFileContents>
                             <bundles>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.core</symbolicName>
-                                    <version>${carbon.kernel.version}</version>
+                                    <symbolicName>carbon-utils</symbolicName>
+                                    <version>${carbon.utils.version}</version>
                                 </bundle>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.base</symbolicName>
+                                    <symbolicName>org.wso2.carbon.core</symbolicName>
                                     <version>${carbon.kernel.version}</version>
                                 </bundle>
                                 <bundle>
@@ -180,6 +204,12 @@
                                     <version>${org.json.import.version}</version>
                                 </bundle>
                             </bundles>
+                            <importFeatures>
+                                <importFeatureDef>
+                                    <id>org.wso2.carbon.config.feature</id>
+                                    <version>${carbon.config.version}</version>
+                                </importFeatureDef>
+                            </importFeatures>
                         </configuration>
                     </execution>
                 </executions>

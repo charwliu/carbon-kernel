@@ -33,7 +33,7 @@ Software Requirements
 -------------------
 1. Java SE Development Kit - 1.8
 
-All known issues have been recorded at https://wso2.org/jira/browse/CARBON
+All known issues have been recorded at https://github.com/wso2/carbon-kernel/issues
 
 Carbon Binary Distribution Directory Structure
 --------------------------------------------
@@ -58,7 +58,7 @@ Carbon Binary Distribution Directory Structure
       Contains all OSGi related libraries and configurations.
 
     - conf
-      Contains server configuration files. Ex: carbon.yaml
+      Contains server configuration files. Ex: deployment.yaml
 
     - logs
       Contains all log files created during execution.

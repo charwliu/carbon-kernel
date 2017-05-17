@@ -31,8 +31,8 @@ import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.carbon.container.options.CarbonDistributionBaseOption;
-import org.wso2.carbon.container.options.CopyDropinsBundleOption;
 import org.wso2.carbon.container.options.CopyFileOption;
+import org.wso2.carbon.container.options.CopyOSGiLibBundleOption;
 import org.wso2.carbon.container.options.DebugOption;
 import org.wso2.carbon.container.options.KeepDirectoryOption;
 import org.wso2.carbon.container.runner.CarbonRunner;
@@ -64,6 +64,8 @@ import static org.ops4j.pax.exam.rbc.Constants.RMI_PORT_PROPERTY;
 
 /**
  * Test Container class to configure the distribution and start the server.
+ *
+ * @since 5.2.0
  */
 public class CarbonTestContainer implements TestContainer {
 
@@ -71,6 +73,7 @@ public class CarbonTestContainer implements TestContainer {
 
     private static final String CARBON_TEST_CONTAINER = "CarbonTestContainer";
     private static final String EXAM_INJECT_PROPERTY = "pax.exam.inject";
+    private static final String LIB_DIRECTORY = "lib";
 
     private final Runner runner;
     private final ExamSystem system;
@@ -86,6 +89,11 @@ public class CarbonTestContainer implements TestContainer {
         this.runner = new CarbonRunner();
     }
 
+    /**
+     * Starts the test container.
+     *
+     * @return this container object for api
+     */
     public synchronized TestContainer start() {
         if (carbonHomeDirectoryOption.getDistributionDirectoryPath() == null
                 && carbonHomeDirectoryOption.getDistributionMavenURL() == null
@@ -124,8 +132,8 @@ public class CarbonTestContainer implements TestContainer {
                 FileUtils.copyDirectory(sourceDirectory.toFile(), targetDirectory.toFile());
             }
 
-            //install bundles to dropins if there are any
-            copyDropinsBundles(targetDirectory);
+            //install bundles if there are any
+            copyOSGiLibBundles(targetDirectory);
 
             //copy files to the distributions if there are any
             copyFiles(targetDirectory);
@@ -167,25 +175,25 @@ public class CarbonTestContainer implements TestContainer {
     }
 
     /**
-     * Copy dependencies specified as carbon dropins bundle option in system to the dropins Directory.
+     * Copy dependencies specified as carbon OSGi-lib option in system to the LIB_DIRECTORY.
      *
      * @param carbonHome carbon home dir
      */
-    private void copyDropinsBundles(Path carbonHome) {
-        Path targetDirectory = carbonHome.resolve("osgi").resolve("dropins");
+    private void copyOSGiLibBundles(Path carbonHome) {
+        Path targetDirectory = carbonHome.resolve(LIB_DIRECTORY);
 
-        Arrays.asList(system.getOptions(CopyDropinsBundleOption.class)).forEach(option -> {
+        Arrays.asList(system.getOptions(CopyOSGiLibBundleOption.class)).forEach(option -> {
             try {
                 copyReferencedArtifactsToDeployDirectory(option.getMavenArtifactUrlReference().getURL(),
                         targetDirectory);
             } catch (IOException e) {
-                throw new TestContainerException("Error while copying artifacts to dropins", e);
+                throw new TestContainerException(String.format("Error while copying artifacts to " + LIB_DIRECTORY), e);
             }
         });
     }
 
     /**
-     * Helper method to copy artifacts to the dropins.
+     * Helper method to copy artifacts to the target directory.
      *
      * @param url             url of the artifact
      * @param targetDirectory target directory
@@ -284,6 +292,12 @@ public class CarbonTestContainer implements TestContainer {
         return deleteRuntime;
     }
 
+    /**
+     * Helper method to build string using options.
+     *
+     * @param options options to convert to string
+     * @return the string build by options
+     */
     private String buildString(ValueOption<?>[] options) {
         return buildString(new String[0], options, new String[0]);
     }
@@ -313,6 +327,11 @@ public class CarbonTestContainer implements TestContainer {
         }
     }
 
+    /**
+     * Stops the regression container.
+     *
+     * @return this container object for api
+     */
     @Override
     public synchronized TestContainer stop() {
         logger.debug("Shutting down the test container.");
@@ -347,6 +366,9 @@ public class CarbonTestContainer implements TestContainer {
         return this;
     }
 
+    /**
+     * Force cleanup directories if required.
+     */
     private void forceCleanup() {
         try {
             FileUtils.forceDeleteOnExit(targetDirectory.toFile());
@@ -355,6 +377,13 @@ public class CarbonTestContainer implements TestContainer {
         }
     }
 
+    /**
+     * Wait for the bundle to reach for the specified state.
+     *
+     * @param bundleId id of the bundle
+     * @param state    state of the bundle
+     * @param timeout  timeout period
+     */
     private synchronized void waitForState(final long bundleId, final int state, final RelativeTimeout timeout) {
         target.getClientRBC().waitForState(bundleId, state, timeout);
     }

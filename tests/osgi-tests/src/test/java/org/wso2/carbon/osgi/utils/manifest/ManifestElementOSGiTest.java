@@ -27,9 +27,9 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.kernel.utils.CarbonServerInfo;
-import org.wso2.carbon.kernel.utils.manifest.ManifestElement;
-import org.wso2.carbon.kernel.utils.manifest.ManifestElementParserException;
+import org.wso2.carbon.kernel.CarbonServerInfo;
+import org.wso2.carbon.kernel.startupresolver.manifest.ManifestElement;
+import org.wso2.carbon.kernel.startupresolver.manifest.ManifestElementParserException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,10 +37,10 @@ import java.util.List;
 import javax.inject.Inject;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyDropinsBundle;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
- * OSGi tests class to test org.wso2.carbon.kernel.utils.manifest.ManifestElement as OSGi service registration.
+ * OSGi tests class to test org.wso2.carbon.utils.manifest.ManifestElement as OSGi service registration.
  *
  * @since 5.0.0
  */
@@ -58,9 +58,9 @@ public class ManifestElementOSGiTest {
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[] { copyDropinsBundle(
+        return new Option[] { copyOSGiLibBundle(
                 maven().artifactId("org.wso2.carbon.sample.deployer.mgt").groupId("org.wso2.carbon")
-                        .versionAsInProject()), copyDropinsBundle(
+                        .versionAsInProject()), copyOSGiLibBundle(
                 maven().artifactId("org.wso2.carbon.sample.order.resolver").groupId("org.wso2.carbon")
                         .versionAsInProject()) };
     }

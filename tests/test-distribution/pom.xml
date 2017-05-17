@@ -72,10 +72,10 @@
                             <goal>install</goal>
                         </goals>
                         <configuration>
-                            <profile>profiles/default</profile>
+                            <runtime>default</runtime>
                             <repositoryURL>file:${basedir}/target/p2-repo</repositoryURL>
-                            <destination>${basedir}/target/wso2carbon-kernel-${carbon.kernel.version}/osgi/</destination>
-                            <deleteOldProfileFiles>true</deleteOldProfileFiles>
+                            <destination>${basedir}/target/wso2carbon-kernel-${carbon.kernel.version}/wso2</destination>
+                            <deleteOldRuntimeFiles>true</deleteOldRuntimeFiles>
                             <features>
                                 <feature>
                                     <id>org.wso2.carbon.pax.exam.feature</id>
@@ -94,7 +94,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <replace token="false" value="true" dir="${basedir}/target/wso2carbon-kernel-${carbon.kernel.version}/osgi">
+                                <replace dir="target/wso2carbon-kernel-${carbon.kernel.version}/wso2" token="false" value="true">
                                     <include name="**/bundles.info" />
                                 </replace>
                             </tasks>
@@ -112,9 +112,11 @@
                                 <delete dir="target/dependency-maven-plugin-markers" />
                                 <delete dir="target/org.eclipse.equinox.executable-3.5.0.v20110530-7P7NFUFFLWUl76mart" />
                                 <delete dir="target/p2-repo" />
+                                <!-- Figure out a way to delete tmp.* files -->
                                 <delete file="target/tmp" />
+                                <delete dir="target/WSO2Carbon" />
                                 <delete dir="target/antrun" />
-                                <delete dir="target/wso2carbon-kernel-${carbon.kernel.version}" />
+                                <delete dir="target/director" />
                             </target>
                         </configuration>
                         <goals>
@@ -138,12 +140,11 @@
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -153,5 +154,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

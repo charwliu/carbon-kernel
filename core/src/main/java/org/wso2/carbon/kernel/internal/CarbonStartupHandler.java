@@ -17,7 +17,8 @@ package org.wso2.carbon.kernel.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.kernel.CarbonServerInfo;
+import org.wso2.carbon.kernel.Constants;
 
 import java.text.DecimalFormat;
 
@@ -35,13 +36,15 @@ public class CarbonStartupHandler {
 
     /**
      * Log the server start up time.
+     *
+     * @param serverName Server name to be in the log
      */
-    public static void logServerStartupTime() {
-        double startTime = Long.parseLong(System.getProperty(org.wso2.carbon.kernel.Constants.START_TIME));
+    public static void logServerStartupTime(String serverName) {
+        double startTime = Long.parseLong(System.getProperty(Constants.START_TIME));
         double startupTime = (System.currentTimeMillis() - startTime) / 1000;
 
         DecimalFormat decimalFormatter = new DecimalFormat("#,##0.000");
-        logger.info("WSO2 Carbon started in " + decimalFormatter.format(startupTime) + " sec");
+        logger.info(serverName + " started in " + decimalFormatter.format(startupTime) + " sec");
     }
 
     /**
@@ -52,5 +55,4 @@ public class CarbonStartupHandler {
         DataHolder.getInstance().getBundleContext().registerService(CarbonServerInfo.class,
                 new CarbonServerInfo(), null);
     }
-
 }

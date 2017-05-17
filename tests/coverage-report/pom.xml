@@ -103,13 +103,11 @@
                                                 <classfiles>
                                                     <fileset dir="../../core/target/classes" />
                                                     <fileset dir="../../launcher/target/classes" />
-                                                    <fileset dir="../../core/target/classes" />
                                                     <fileset dir="../../tools/tools-core/target/classes" />
                                                 </classfiles>
                                                 <sourcefiles encoding="UTF-8">
                                                     <fileset dir="../../core/src" />
                                                     <fileset dir="../../launcher/src" />
-                                                    <fileset dir="../../core/src" />
                                                     <fileset dir="../../tools/tools-core/src" />
                                                 </sourcefiles>
                                             </structure>

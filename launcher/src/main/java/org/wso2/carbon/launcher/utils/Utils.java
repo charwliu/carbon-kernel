@@ -50,7 +50,7 @@ public class Utils {
      * @return resolved system property value
      */
     public static String initializeSystemProperties(String value) {
-        //TODO this method is duplicated in org.wso2.carbon.kernel.utils.Utils class. FIX IT.
+        //TODO this method is duplicated in org.wso2.carbon.utils.Utils class. FIX IT.
         String newValue = value;
         Matcher matcher = varPattern.matcher(value);
         while (matcher.find()) {
@@ -108,7 +108,7 @@ public class Utils {
      * @return launch configuration directory path
      */
     public static Path getLaunchConfigDirectory() {
-        return Paths.get(System.getProperty(Constants.CARBON_HOME), "conf", Constants.OSGI_REPOSITORY);
+        return Paths.get(System.getProperty(Constants.CARBON_HOME), Constants.LAUNCH_CONF_DIRECTORY);
     }
 
     /**

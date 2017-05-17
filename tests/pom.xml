@@ -31,6 +31,7 @@
     <modules>
         <module>test-distribution</module>
         <module>test-artifacts</module>
+        <module>test-carbon-touchpoint-distribution</module>
         <module>osgi-tests</module>
         <module>coverage-report</module>
     </modules>
@@ -105,6 +106,11 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.sample.transport.custom2</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.sample.transport.file</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
             <dependency>

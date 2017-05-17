@@ -29,10 +29,10 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
 import org.wso2.carbon.container.options.CopyFileOption;
 import org.wso2.carbon.context.test.CarbonContextInvoker;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 import org.wso2.carbon.kernel.Constants;
 import org.wso2.carbon.kernel.context.CarbonContext;
 import org.wso2.carbon.kernel.context.PrivilegedCarbonContext;
-import org.wso2.carbon.kernel.utils.CarbonServerInfo;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +41,7 @@ import javax.inject.Inject;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.wso2.carbon.container.options.CarbonDistributionOption.copyDropinsBundle;
+import static org.wso2.carbon.container.options.CarbonDistributionOption.copyOSGiLibBundle;
 
 /**
  * CarbonContextOSGiTest class is to test the functionality of the Carbon Context API.
@@ -54,13 +54,14 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyDro
 public class CarbonContextOSGiTest {
     private static final Logger logger = LoggerFactory.getLogger(CarbonContextOSGiTest.class);
     private static final String TEST_TENANT_NAME = "test.tenant";
+    private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
 
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
     @Configuration
     public Option[] createConfiguration() {
-        return new Option[] { copyCarbonYAMLOption(), copyDropinsBundle(
+        return new Option[] { copyCarbonYAMLOption(), copyOSGiLibBundle(
                 maven().artifactId("carbon-context-test-artifact").groupId("org.wso2.carbon").versionAsInProject()),
                 systemProperty(Constants.TENANT_NAME).value(TEST_TENANT_NAME) };
     }
@@ -125,7 +126,7 @@ public class CarbonContextOSGiTest {
     }
 
     /**
-     * Replace the existing carbon.yaml file with the file found at runtime resources directory.
+     * Replace the existing deployment.yaml file with the file found at runtime resources directory.
      */
     private CopyFileOption copyCarbonYAMLOption() {
         Path carbonYmlFilePath;
@@ -134,7 +135,7 @@ public class CarbonContextOSGiTest {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-context", "carbon.yaml");
-        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", "carbon.yaml"));
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-context", DEPLOYMENT_FILENAME);
+        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", DEPLOYMENT_FILENAME));
     }
 }

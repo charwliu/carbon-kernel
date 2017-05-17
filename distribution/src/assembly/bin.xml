@@ -29,7 +29,6 @@
             <outputDirectory></outputDirectory>
             <fileMode>644</fileMode>
             <excludes>
-                <exclude>**/eclipse.ini</exclude>
                 <exclude>**/*.lock</exclude>
                 <exclude>**/.data</exclude>
                 <exclude>**/.settings</exclude>
@@ -64,7 +63,7 @@
 
     <files>
         <file>
-            <source>target/WSO2Carbon/conf/carbon.yaml</source>
+            <source>target/WSO2Carbon/conf/deployment.yaml</source>
             <outputDirectory>conf/</outputDirectory>
             <fileMode>644</fileMode>
             <filtered>true</filtered>

@@ -26,7 +26,7 @@ import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.wso2.carbon.container.CarbonContainerFactory;
-import org.wso2.carbon.kernel.utils.CarbonServerInfo;
+import org.wso2.carbon.kernel.CarbonServerInfo;
 
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
@@ -48,11 +48,13 @@ import static org.wso2.carbon.container.options.CarbonDistributionOption.copyFil
 public class JMXOSGiTest {
 
     private static final Logger logger = LoggerFactory.getLogger(JMXOSGiTest.class);
+    private static final String DEPLOYMENT_FILENAME = "deployment.yaml";
+
     @Inject
     private CarbonServerInfo carbonServerInfo;
 
     /**
-     * Replace the existing carbon.yaml file with populated carbon.yaml file.
+     * Replace the existing deployment.yaml file with populated deployment.yaml file.
      */
     private Option copyCarbonYAMLOption() {
         Path carbonYmlFilePath;
@@ -61,9 +63,9 @@ public class JMXOSGiTest {
         if (basedir == null) {
             basedir = Paths.get(".").toString();
         }
-        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "jmx", "carbon.yaml");
+        carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "jmx", DEPLOYMENT_FILENAME);
 
-        return copyFile(carbonYmlFilePath, Paths.get("conf", "carbon.yaml"));
+        return copyFile(carbonYmlFilePath, Paths.get("conf", DEPLOYMENT_FILENAME));
     }
 
     @Configuration

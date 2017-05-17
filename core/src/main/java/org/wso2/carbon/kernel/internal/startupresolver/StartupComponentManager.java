@@ -151,14 +151,14 @@ class StartupComponentManager {
     }
 
     /**
-     * Adds expect required capability. Capability could be an OSGi service, manifest header etc.
+     * Adds expected required capability. Capability could be an OSGi service, manifest header etc.
      * <p>
      * This method is invoked during the manifest header processing time or when {@code CapabilityProvider}
      * OSGi service is registered.
      *
      * @param capability {@code Capability} instance
      */
-    void addExpectedOrAvailableCapability(Capability capability) {
+    void addExpectedCapability(Capability capability) {
         startupComponentMap.values()
                 .stream()
                 .filter(startupComponent -> startupComponent.isServiceRequired(capability.getName()))
@@ -167,7 +167,7 @@ class StartupComponentManager {
                     if (startupComponent.isSatisfied()) {
                         logger.warn("You are trying to add an {} capability {} from bundle({}:{}) to an already " +
                                         "activated startup listener component {} in bundle({}:{}). Refer the Startup " +
-                                        "Order Resolver documentation and validated your configuration",
+                                        "Order Resolver documentation and verify your configuration",
                                 (capability.getState() == Capability.CapabilityState.AVAILABLE) ?
                                         "available" : "expected",
                                 capability.getName(),
@@ -188,9 +188,21 @@ class StartupComponentManager {
                                 capability.getBundle().getVersion(),
                                 startupComponent.getName());
                     }
-                    startupComponent.addExpectedOrAvailableCapability(capability);
+                    startupComponent.addExpectedCapability(new Capability(capability));
                 });
 
+    }
+
+    /**
+     * Updates the OSGi service availability in {@code startupComponent}s in {@code startupComponentMap}.
+     *
+     * @param capability the capability to be updated.
+     */
+    void updateCapability(Capability capability) {
+        startupComponentMap.values()
+                .stream()
+                .filter(startupComponent -> startupComponent.isServiceRequired(capability.getName()))
+                .forEach(startupComponent -> startupComponent.updateCapability(capability));
     }
 
     /**
