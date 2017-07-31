@@ -56,7 +56,7 @@ public class PropertyResolveConfigProviderOSGITest {
 
     @Configuration
     public Option[] createConfiguration() {
-        setEnvProperty("server.name", "Test WSO2 Carbon Kernel");
+        setEnvProperty("SERVER_NAME", "Test WSO2 Carbon Kernel");
         return new Option[]{ copyCarbonYAMLOption(), systemProperty("server.id").value("test-carbon-kernel"),
                 copySecretPropertiesOption() };
     }
@@ -89,7 +89,7 @@ public class PropertyResolveConfigProviderOSGITest {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-config",
                 DEPLOYMENT_FILENAME);
-        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", DEPLOYMENT_FILENAME));
+        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", "default", DEPLOYMENT_FILENAME));
     }
 
     /**
@@ -106,7 +106,7 @@ public class PropertyResolveConfigProviderOSGITest {
         }
         carbonYmlFilePath = Paths.get(basedir, "src", "test", "resources", "carbon-config",
                 SECRET_PROPERTIES_FILENAME);
-        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", SECRET_PROPERTIES_FILENAME));
+        return new CopyFileOption(carbonYmlFilePath, Paths.get("conf", "default", SECRET_PROPERTIES_FILENAME));
     }
 
     /**
