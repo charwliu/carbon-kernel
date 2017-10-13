@@ -12,7 +12,7 @@ What's New In This Release
 ----------------------------
 1. Upgrade to Eclipse Luna SR2 OSGi Framework.
 2. Pax Exam OSGi Test Framework Support.
-3. Carbon Feature Plugin 2.0 integration.
+3. Carbon Feature Plugin 3.0 integration.
 4. Logging framework backend upgraded to log4j 2.0 support.
 
 Installation & Running
@@ -31,7 +31,7 @@ Hardware Requirements
 
 Software Requirements
 -------------------
-1. Java SE Development Kit - 1.8
+1. Java SE Runtime - 1.8
 
 All known issues have been recorded at https://github.com/wso2/carbon-kernel/issues
 
